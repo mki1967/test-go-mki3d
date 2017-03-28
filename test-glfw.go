@@ -40,7 +40,7 @@ func main() {
 	}
 	defer glfw.Terminate()
 
-	glfw.WindowHint(glfw.Resizable, glfw.False)
+	glfw.WindowHint(glfw.Resizable, glfw.True)
 	glfw.WindowHint(glfw.ContextVersionMajor, 3)
 	glfw.WindowHint(glfw.ContextVersionMinor, 3)
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
@@ -60,11 +60,20 @@ func main() {
 	fmt.Println("OpenGL version", version)
 
 
+	
 	// Configure global settings
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0.0, 0.0, 0.3, 1.0)
 
+	// callbacks
+	window.SetSizeCallback(
+                func (w *glfw.Window, width int, height int) {
+                        gl.Viewport(0,0, int32(width), int32(height))
+                        fmt.Println(width, height)
+                })
+
+	
 	previousTime := glfw.GetTime()
 	// main loop
 	for !window.ShouldClose() {
