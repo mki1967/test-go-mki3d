@@ -1,3 +1,5 @@
+// run with: go run test-glfw.go shaders.go
+
 package main
 
 import (
@@ -21,7 +23,9 @@ const windowWidth = 800
 const windowHeight = 600
 
 func main() {
-
+	fmt.Println(vertexShader)
+	fmt.Println(fragmentShader)
+	
 
 	mki3dData, err := mki3d.ReadFile("noname.mki3d")
 	if err!=nil {
@@ -59,7 +63,7 @@ func main() {
 	// Configure global settings
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
-	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
+	gl.ClearColor(0.0, 0.0, 0.3, 1.0)
 
 	previousTime := glfw.GetTime()
 	// main loop
