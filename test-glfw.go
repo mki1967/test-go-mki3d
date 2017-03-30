@@ -4,15 +4,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/mki1967/go-mki3d/mki3d"
-	"runtime"
-	"log"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
+	"github.com/mki1967/go-mki3d/mki3d"
+	"log"
+	"runtime"
 	// "github.com/go-gl/mathgl/mgl32"
-
 )
-
 
 func init() {
 	// GLFW event handling must run on the main OS thread
@@ -25,16 +23,15 @@ const windowHeight = 600
 func main() {
 	fmt.Println(vertexShader)
 	fmt.Println(fragmentShader)
-	
 
 	mki3dData, err := mki3d.ReadFile("noname.mki3d")
-	if err!=nil {
-		panic( err )
+	if err != nil {
+		panic(err)
 	}
-        fmt.Println(mki3d.Stringify(mki3dData))
+	fmt.Printf("%v\n", mki3d.Stringify(mki3dData))
 
 	// fragments from https://github.com/go-gl/examples/blob/master/gl41core-cube/cube.go
-	
+
 	if err := glfw.Init(); err != nil {
 		log.Fatalln("failed to initialize glfw:", err)
 	}
@@ -59,21 +56,26 @@ func main() {
 	version := gl.GoStr(gl.GetString(gl.VERSION))
 	fmt.Println("OpenGL version", version)
 
-
-	
 	// Configure global settings
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0.0, 0.0, 0.3, 1.0)
 
+	// test Mki3dShader
+	mki3dShaderPtr, err := MakeMki3dShader()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(*mki3dShaderPtr) // test
+
 	// callbacks
 	window.SetSizeCallback(
-                func (w *glfw.Window, width int, height int) {
-                        gl.Viewport(0,0, int32(width), int32(height))
-                        fmt.Println(width, height)
-                })
+		func(w *glfw.Window, width int, height int) {
+			gl.Viewport(0, 0, int32(width), int32(height))
+			fmt.Println(width, height)
+		})
 
-	
 	previousTime := glfw.GetTime()
 	// main loop
 	for !window.ShouldClose() {
@@ -83,24 +85,24 @@ func main() {
 		time := glfw.GetTime()
 		elapsed := time - previousTime
 		previousTime = time
-		_ =elapsed // do not forget!
-		
-		/* 
-		angle += elapsed
-		model = mgl32.HomogRotate3D(float32(angle), mgl32.Vec3{0, 1, 0})
+		_ = elapsed // do not forget!
 
-		// Render
-		gl.UseProgram(program)
-		gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
+		/*
+			angle += elapsed
+			model = mgl32.HomogRotate3D(float32(angle), mgl32.Vec3{0, 1, 0})
 
-		gl.BindVertexArray(vao)
+			// Render
+			gl.UseProgram(program)
+			gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
 
-		gl.ActiveTexture(gl.TEXTURE0)
-		gl.BindTexture(gl.TEXTURE_2D, texture)
+			gl.BindVertexArray(vao)
 
-		gl.DrawArrays(gl.TRIANGLES, 0, 6*2*3)
-                */
-		
+			gl.ActiveTexture(gl.TEXTURE0)
+			gl.BindTexture(gl.TEXTURE_2D, texture)
+
+			gl.DrawArrays(gl.TRIANGLES, 0, 6*2*3)
+		*/
+
 		// Maintenance
 		window.SwapBuffers()
 		glfw.PollEvents()

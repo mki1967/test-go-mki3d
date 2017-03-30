@@ -1,13 +1,10 @@
-
 package main
-
 
 import (
 	"fmt"
-	"strings"
 	"github.com/go-gl/gl/v3.3-core/gl"
+	"strings"
 )
-
 
 var vertexShader = `
 #version 330
@@ -31,9 +28,9 @@ void main() {
     /* compute shaded color */
     vec4 modelNormal=model*vec4(normal, 1);
     float shade= abs( dot( modelNormal, light ) ); 
-    vColor= ambient+(1.0-ambient)*shade;
+    vColor= (ambient+(1.0-ambient)*shade)*vec4(color, 1.0);
     /* compute projected position */
-    gl_Position = projection*view*model*vec4(position, 1);
+    gl_Position = projection*view*model*vec4(position, 1.0);
 }
 ` + "\x00"
 
@@ -51,7 +48,7 @@ void main() {
 }
 ` + "\x00"
 
-// from https://github.com/go-gl/examples/blob/master/gl41core-cube/cube.go 
+// from https://github.com/go-gl/examples/blob/master/gl41core-cube/cube.go
 func compileShader(source string, shaderType uint32) (uint32, error) {
 	shader := gl.CreateShader(shaderType)
 
@@ -75,8 +72,7 @@ func compileShader(source string, shaderType uint32) (uint32, error) {
 	return shader, nil
 }
 
-
-// from https://github.com/go-gl/examples/blob/master/gl41core-cube/cube.go 
+// from https://github.com/go-gl/examples/blob/master/gl41core-cube/cube.go
 func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error) {
 	vertexShader, err := compileShader(vertexShaderSource, gl.VERTEX_SHADER)
 	if err != nil {
@@ -112,18 +108,40 @@ func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error)
 	return program, nil
 }
 
-
 type Mki3dShader struct {
 	// program Id
 	ProgramId uint32
 	// locations of attributes
-	PositionsAttr uint32
-	NormalsAttr uint32
-	ColorsAttr uint32
-        // locations of uniforms	
-	ProjectionUni uint32
-	ViewUni uint32
-	ModelUni  uint32
-	LightUni uint32
+	PositionAttr uint32
+	NormalAttr   uint32
+	ColorAttr    uint32
+	// locations of uniforms ( why int32 instead of uint32 ? )
+	ProjectionUni int32
+	ViewUni       int32
+	ModelUni      int32
+	LightUni      int32
 }
 
+func MakeMki3dShader() (shaderPtr *Mki3dShader, err error) {
+	program, err := newProgram(vertexShader, fragmentShader)
+	if err != nil {
+		return nil, err
+	}
+
+	var shader Mki3dShader
+
+	// set ProgramId
+	shader.ProgramId = program
+
+	// set attributes
+	shader.PositionAttr = uint32(gl.GetAttribLocation(program, gl.Str("position\x00")))
+	shader.NormalAttr = uint32(gl.GetAttribLocation(program, gl.Str("normal\x00")))
+	shader.ColorAttr = uint32(gl.GetAttribLocation(program, gl.Str("color\x00")))
+
+	// set uniforms
+	shader.ProjectionUni = gl.GetUniformLocation(program, gl.Str("projection\x00"))
+	shader.ViewUni = gl.GetUniformLocation(program, gl.Str("view\x00"))
+	shader.ModelUni = gl.GetUniformLocation(program, gl.Str("model\x00"))
+	shader.LightUni = gl.GetUniformLocation(program, gl.Str("light\x00"))
+	return &shader, nil
+}
