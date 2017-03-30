@@ -21,8 +21,8 @@ const windowWidth = 800
 const windowHeight = 600
 
 func main() {
-	fmt.Println(vertexShader)
-	fmt.Println(fragmentShader)
+	// fmt.Println(vertexShaderT)
+	// fmt.Println(fragmentShader)
 
 	mki3dData, err := mki3d.ReadFile("noname.mki3d")
 	if err != nil {
@@ -62,12 +62,12 @@ func main() {
 	gl.ClearColor(0.0, 0.0, 0.3, 1.0)
 
 	// test Mki3dShader
-	mki3dShaderPtr, err := MakeMki3dShader()
+	mki3dShaderTPtr, err := MakeMki3dShaderT()
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("%+v\n", *mki3dShaderPtr) // test
+	fmt.Printf("%+v\n", *mki3dShaderTPtr) // test
 
 	// test Mki3dGLBuf
 

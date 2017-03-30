@@ -7,7 +7,8 @@ import (
 	"strings"
 )
 
-var vertexShader = `
+// Vertex shader for drawing triangles
+var vertexShaderT = `
 #version 330
 
 /* attributes */
@@ -35,6 +36,31 @@ void main() {
 }
 ` + "\x00"
 
+// vertex shader for drawing segments
+var vertexShaderS = `
+#version 330
+
+/* attributes */
+layout (location = 0) in vec3 position;
+layout (location = 2) in vec3 color;
+
+/* uniforms */
+uniform mat4 model; 
+uniform mat4 view;
+uniform mat4 projection;
+ 
+/* output to fragment shader */
+out vec4 vColor;
+
+void main() {
+    /* compute shaded color */
+    vColor= vec4(color, 1.0);
+    /* compute projected position */
+    gl_Position = projection*view*model*vec4(position, 1.0);
+}
+` + "\x00"
+
+// fragment shader - the same for segments and triangles
 var fragmentShader = `
 #version 330
 
@@ -109,8 +135,9 @@ func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error)
 	return program, nil
 }
 
-// structure for standard mki3d shader with references to attributes and uniform locations
-type Mki3dShader struct {
+// structure for mki3d shader for drawing triangles
+// with references to attributes and uniform locations.
+type Mki3dShaderT struct {
 	// program Id
 	ProgramId uint32
 	// locations of attributes
@@ -124,16 +151,16 @@ type Mki3dShader struct {
 	LightUni      int32
 }
 
-// MakeMki3dShader compiles standard mki3d shader and
-// returns Mki3dShader structure with reference to the program and its attributes and uniforms
+// MakeMki3dShaderT compiles  mki3d shader and
+// returns Mki3dShaderT structure with reference to the program and its attributes and uniforms
 // or error
-func MakeMki3dShader() (shaderPtr *Mki3dShader, err error) {
-	program, err := newProgram(vertexShader, fragmentShader)
+func MakeMki3dShaderT() (shaderPtr *Mki3dShaderT, err error) {
+	program, err := newProgram(vertexShaderT, fragmentShader)
 	if err != nil {
 		return nil, err
 	}
 
-	var shader Mki3dShader
+	var shader Mki3dShaderT
 
 	// set ProgramId
 	shader.ProgramId = program
@@ -150,6 +177,8 @@ func MakeMki3dShader() (shaderPtr *Mki3dShader, err error) {
 	shader.LightUni = gl.GetUniformLocation(program, gl.Str("light\x00"))
 	return &shader, nil
 }
+
+// TO DO: Mki3dShaderS, MakeMki3dShaderS() ...
 
 // references to the objects defining the shape and parameters of mki3d object
 type Mki3dGLBuf struct {
