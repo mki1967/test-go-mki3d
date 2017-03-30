@@ -67,7 +67,16 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(*mki3dShaderPtr) // test
+	fmt.Printf("%+v\n", *mki3dShaderPtr) // test
+
+	// test Mki3dGLBuf
+
+	mki3dGLBufPtr, err := MakeMki3dGLBuf(mki3dData)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%+v\n", *mki3dGLBufPtr) // test
 
 	// callbacks
 	window.SetSizeCallback(

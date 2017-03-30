@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/go-gl/gl/v3.3-core/gl"
+	"github.com/mki1967/go-mki3d/mki3d"
 	"strings"
 )
 
@@ -108,6 +109,7 @@ func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error)
 	return program, nil
 }
 
+// structure for standard mki3d shader with references to attributes and uniform locations
 type Mki3dShader struct {
 	// program Id
 	ProgramId uint32
@@ -122,6 +124,9 @@ type Mki3dShader struct {
 	LightUni      int32
 }
 
+// MakeMki3dShader compiles standard mki3d shader and
+// returns Mki3dShader structure with reference to the program and its attributes and uniforms
+// or error
 func MakeMki3dShader() (shaderPtr *Mki3dShader, err error) {
 	program, err := newProgram(vertexShader, fragmentShader)
 	if err != nil {
@@ -144,4 +149,42 @@ func MakeMki3dShader() (shaderPtr *Mki3dShader, err error) {
 	shader.ModelUni = gl.GetUniformLocation(program, gl.Str("model\x00"))
 	shader.LightUni = gl.GetUniformLocation(program, gl.Str("light\x00"))
 	return &shader, nil
+}
+
+// references to the objects defining the shape and parameters of mki3d object
+type Mki3dGLBuf struct {
+	// buffer objects in GL
+	// triangles:
+	trianglePositionBuf uint32
+	triangleNormalBuf   uint32
+	triangleColorBuf    uint32
+	// segments:
+	segmentPositionBuf uint32
+	segmentColorBuf    uint32
+}
+
+func (glBuf *Mki3dGLBuf) LoadTrianglePositions(mki3dData *mki3d.Mki3dType) {
+	data := make([]float32, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
+	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.trianglePositionBuf)
+	gl.BufferData(gl.ARRAY_BUFFER, len(data)*4 /* 4 bytes per flat32 */, gl.Ptr(data), gl.STATIC_DRAW)
+	gl.BindBuffer(gl.ARRAY_BUFFER, 0) // unbind
+}
+
+func MakeMki3dGLBuf(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBuf, err error) {
+	var glBuf Mki3dGLBuf
+	var vbo [5]uint32 // 5 is the number of buffers
+	gl.GenBuffers(5, &vbo[0])
+
+	// assign buffer ids from vbo array
+	glBuf.trianglePositionBuf = vbo[0]
+	glBuf.triangleNormalBuf = vbo[1]
+	glBuf.triangleColorBuf = vbo[2]
+	glBuf.segmentPositionBuf = vbo[3]
+	glBuf.segmentColorBuf = vbo[4]
+
+	// load data from mki3dData
+	glBuf.LoadTrianglePositions(mki3dData)
+	// ...
+
+	return &glBuf, nil
 }
