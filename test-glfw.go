@@ -79,6 +79,9 @@ func main() {
 
 	fmt.Printf("%+v\n", *mki3dGLBufPtr) // test
 
+	// test ViewMatrix
+	fmt.Println(ViewMatrix(mki3dData.View))
+
 	// callbacks
 	window.SetSizeCallback(
 		func(w *glfw.Window, width int, height int) {

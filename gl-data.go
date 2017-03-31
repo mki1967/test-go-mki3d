@@ -138,9 +138,30 @@ func ProjectionMatrix(p mki3d.ProjectionType, width, height int) mgl32.Mat4 {
 	m.SetRow(1, mgl32.Vec4{0, yy, 0, 0})
 	m.SetRow(2, mgl32.Vec4{0, 0, zz, wz})
 	m.SetRow(3, mgl32.Vec4{0, 0, zw, 0})
+	return m
 
-	// ...
+}
 
+// Mat3 converts Matrix3dType to mgl32.Mat3
+func Mat3(m mki3d.Matrix3dType) mgl32.Mat3 {
+	var q mgl32.Mat3
+	q.SetRow(0, mgl32.Vec3(m[0]))
+	q.SetRow(1, mgl32.Vec3(m[1]))
+	q.SetRow(2, mgl32.Vec3(m[2]))
+	return q
+}
+
+func ViewMatrix(v mki3d.ViewType) mgl32.Mat4 {
+
+	mov := mgl32.Vec3(v.FocusPoint).Mul(-1)
+
+	rot := Mat3(v.RotationMatrix).Mul(v.Scale)
+	scrSh := v.ScreenShift
+
+	m := rot.Mat4()
+	m.SetCol(3, mgl32.Vec4{mov.Dot(rot.Row(0)) + scrSh[0], mov.Dot(rot.Row(1)) + scrSh[1], mov.Dot(rot.Row(2)) + scrSh[2], 1.0})
+
+	//
 	return m
 
 }
