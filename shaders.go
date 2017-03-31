@@ -21,7 +21,7 @@ layout (location = 2) in vec3 color;
 uniform mat4 model; 
 uniform mat4 view;
 uniform mat4 projection;
-uniform vec4 light;
+uniform vec3 light;
 uniform float ambient; 
  
 /* output to fragment shader */
@@ -30,7 +30,7 @@ out vec4 vColor;
 void main() {
     /* compute shaded color */
     vec4 modelNormal=model*vec4(normal, 1);
-    float shade= abs( dot( modelNormal, light ) ); 
+    float shade= abs( dot( modelNormal.xyz, light ) ); 
     vColor= (ambient+(1.0-ambient)*shade)*vec4(color, 1.0);
     /* compute projected position */
     gl_Position = projection*view*model*vec4(position, 1.0);

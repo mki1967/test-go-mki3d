@@ -9,6 +9,8 @@ import (
 )
 
 // references to the objects defining the shape and parameters of mki3d object
+
+// Mki3dGLBuf contains references to GL buffers for shaders' input attributes
 type Mki3dGLBuf struct {
 	// buffer objects in GL
 	// triangles:
@@ -103,4 +105,52 @@ func MakeMki3dGLBuf(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBuf, err error
 	// ...
 
 	return &glBuf, nil
+}
+
+// Mki3dGLUni - values of parameters to be stored in shaders' uniforms
+type Mki3dGLUni struct {
+	ProjectionUni mgl32.Mat4
+	ViewUni       mgl32.Mat4
+	ModelUni      mgl32.Mat4
+	LightUni      mgl32.Vec3
+}
+
+func ProjectionMatrix(p mki3d.ProjectionType, width, height int) mgl32.Mat4 {
+	// make both width and height greater than zero
+	if width < 1 {
+		width = 1
+	}
+	if height < 1 {
+		height = 1
+	}
+
+	h := float32(height)
+	w := float32(width)
+	xx := p.ZoomY * h / w
+	yy := p.ZoomY
+	zz := (p.ZFar + p.ZNear) / (p.ZFar - p.ZNear)
+	zw := float32(1.0)
+	wz := -2 * p.ZFar * p.ZNear / (p.ZFar - p.ZNear)
+
+	var m mgl32.Mat4
+
+	m.SetRow(0, mgl32.Vec4{xx, 0, 0, 0})
+	m.SetRow(1, mgl32.Vec4{0, yy, 0, 0})
+	m.SetRow(2, mgl32.Vec4{0, 0, zz, wz})
+	m.SetRow(3, mgl32.Vec4{0, 0, zw, 0})
+
+	// ...
+
+	return m
+
+}
+
+func MakeMki3dGLUni(mki3dData *mki3d.Mki3dType) (glUniPtr *Mki3dGLUni, err error) {
+	var glUni Mki3dGLUni
+	glUni.LightUni = mgl32.Vec3(mki3dData.Light.Vector)
+	glUni.ModelUni = mgl32.Ident4()
+	glUni.ProjectionUni = mgl32.Ident4()
+
+	// ...
+	return &glUni, nil
 }

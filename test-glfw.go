@@ -84,6 +84,7 @@ func main() {
 		func(w *glfw.Window, width int, height int) {
 			gl.Viewport(0, 0, int32(width), int32(height))
 			fmt.Println(width, height)
+			fmt.Println(ProjectionMatrix(mki3dData.Projection, width, height))
 		})
 
 	previousTime := glfw.GetTime()
