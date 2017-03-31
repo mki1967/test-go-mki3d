@@ -61,13 +61,19 @@ func main() {
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0.0, 0.0, 0.3, 1.0)
 
-	// test Mki3dShader
+	// test Mki3dShaderT
 	mki3dShaderTPtr, err := MakeMki3dShaderT()
 	if err != nil {
 		panic(err)
 	}
-
 	fmt.Printf("%+v\n", *mki3dShaderTPtr) // test
+
+	// test Mki3dShaderS
+	mki3dShaderSPtr, err := MakeMki3dShaderS()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%+v\n", *mki3dShaderSPtr) // test
 
 	// test Mki3dGLBuf
 

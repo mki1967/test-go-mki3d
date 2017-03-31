@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/go-gl/gl/v3.3-core/gl"
+	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/go-mki3d/mki3d"
 	"strings"
 )
@@ -179,27 +180,80 @@ func MakeMki3dShaderT() (shaderPtr *Mki3dShaderT, err error) {
 }
 
 // TO DO: Mki3dShaderS, MakeMki3dShaderS() ...
+// Mki3dShaderS is a structure for mki3d shader for drawing segments
+// with references to attributes and uniform locations.
+type Mki3dShaderS struct {
+	// program Id
+	ProgramId uint32
+	// locations of attributes
+	PositionAttr uint32
+	ColorAttr    uint32
+	// locations of uniforms ( why int32 instead of uint32 ? )
+	ProjectionUni int32
+	ViewUni       int32
+	ModelUni      int32
+}
+
+// MakeMki3dShaderS compiles  mki3d shader and
+// returns Mki3dShaderS structure with reference to the program and its attributes and uniforms
+// or error
+func MakeMki3dShaderS() (shaderPtr *Mki3dShaderS, err error) {
+	program, err := newProgram(vertexShaderS, fragmentShader)
+	if err != nil {
+		return nil, err
+	}
+
+	var shader Mki3dShaderS
+
+	// set ProgramId
+	shader.ProgramId = program
+
+	// set attributes
+	shader.PositionAttr = uint32(gl.GetAttribLocation(program, gl.Str("position\x00")))
+	shader.ColorAttr = uint32(gl.GetAttribLocation(program, gl.Str("color\x00")))
+
+	// set uniforms
+	shader.ProjectionUni = gl.GetUniformLocation(program, gl.Str("projection\x00"))
+	shader.ViewUni = gl.GetUniformLocation(program, gl.Str("view\x00"))
+	shader.ModelUni = gl.GetUniformLocation(program, gl.Str("model\x00"))
+	return &shader, nil
+}
 
 // references to the objects defining the shape and parameters of mki3d object
 type Mki3dGLBuf struct {
 	// buffer objects in GL
 	// triangles:
+	triangleVertexCount int32 // the last argument for gl.DrawArrays
 	trianglePositionBuf uint32
 	triangleNormalBuf   uint32
 	triangleColorBuf    uint32
 	// segments:
+	segmentVertexCount int32 // the last argument for gl.DrawArrays
 	segmentPositionBuf uint32
 	segmentColorBuf    uint32
 }
 
 func (glBuf *Mki3dGLBuf) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
+	glBuf.triangleVertexCount = int32(3 * len(mki3dData.Model.Triangles))
 	dataPos := make([]float32, 0, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
 	dataCol := make([]float32, 0, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
+	dataNor := make([]float32, 0, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
 	i := 0
 	for _, triangle := range mki3dData.Model.Triangles {
+		// compute normal
+		a := mgl32.Vec3(triangle[0].Position)
+		b := mgl32.Vec3(triangle[1].Position)
+		c := mgl32.Vec3(triangle[2].Position)
+		normal := (b.Sub(a)).Cross(c.Sub(a))
+		if normal.Dot(normal) > 0 {
+			normal = normal.Normalize()
+		}
+		// fmt.Println( "normal: ", normal ) /// test ...
+		// append to buffers
 		for j := 0; j < 3; j++ {
 			dataPos = append(dataPos, triangle[j].Position[0:3]...)
 			dataCol = append(dataCol, triangle[j].Color[0:3]...)
+			dataNor = append(dataNor, normal[0:3]...)
 			i = i + 3
 		}
 	}
@@ -216,6 +270,7 @@ func (glBuf *Mki3dGLBuf) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
 }
 
 func (glBuf *Mki3dGLBuf) LoadSegmentBufs(mki3dData *mki3d.Mki3dType) {
+	glBuf.segmentVertexCount = int32(2 * len(mki3dData.Model.Segments))
 	dataPos := make([]float32, 0, 6*len(mki3dData.Model.Segments)) // each segment has 2*3 coordinates
 	dataCol := make([]float32, 0, 6*len(mki3dData.Model.Segments)) // each segment has 2*3 coordinates
 	i := 0
