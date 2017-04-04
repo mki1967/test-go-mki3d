@@ -7,8 +7,10 @@ import (
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/mki1967/go-mki3d/mki3d"
+	"github.com/mki1967/test-go-mki3d/tmki3d"
 	"log"
 	"runtime"
+	
 	// "github.com/go-gl/mathgl/mgl32"
 )
 
@@ -62,7 +64,7 @@ func main() {
 	gl.ClearColor(0.0, 0.0, 0.3, 1.0)
 
 	// test Mki3dShader
-	mki3dShaderPtr, err := MakeMki3dShader()
+	mki3dShaderPtr, err := tmki3d.MakeMki3dShader()
 	if err != nil {
 		panic(err)
 	}
@@ -72,7 +74,7 @@ func main() {
 
 	// test Mki3dGLBuf
 
-	mki3dGLBufPtr, err := MakeMki3dGLBuf(mki3dData)
+	mki3dGLBufPtr, err := tmki3d.MakeMki3dGLBuf(mki3dData)
 	if err != nil {
 		panic(err)
 	}
@@ -83,11 +85,11 @@ func main() {
 	// fmt.Println(ViewMatrix(mki3dData.View))
 
 	// test SetFromMki3d
-	var mki3dGLUni Mki3dGLUni
+	var mki3dGLUni tmki3d.Mki3dGLUni
 	mki3dGLUni.SetFromMki3d(mki3dData, 100, 100)
 	fmt.Printf("%+v\n", mki3dGLUni)
 
-	mki3dDataShaderTrPtr, err := MakeMki3dDataShaderTr(mki3dShaderPtr.Tr, &(mki3dGLBufPtr.Tr), &mki3dGLUni)
+	mki3dDataShaderTrPtr, err := tmki3d.MakeMki3dDataShaderTr(mki3dShaderPtr.Tr, &(mki3dGLBufPtr.Tr), &mki3dGLUni)
 	if err != nil {
 		panic(err)
 	}

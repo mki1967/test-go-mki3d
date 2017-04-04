@@ -1,4 +1,4 @@
-package main
+package tmki3d
 
 import (
 	// "fmt"
