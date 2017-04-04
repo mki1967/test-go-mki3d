@@ -34,9 +34,27 @@ func MakeMki3dDataShaderTr(sPtr *Mki3dShaderTr, bPtr *Mki3dGLBufTr, uPtr *Mki3dG
 		return nil, err
 	}
 
+	ds.InitVAO()
+	ds.LightToShader()
 	// OK
 	return &ds, nil
 
+}
+
+// LightUniToShader sets  light uniform parameters from ds.UniPtr to ds.ShaderPtr  (both must be not nil and previously initiated)
+func (ds *Mki3dDataShaderTr) LightToShader() (err error) {
+	if ds.ShaderPtr == nil {
+		return errors.New("ds.ShaderPtr == nil // type *Mki3dShaderTr")
+	}
+	if ds.UniPtr == nil {
+		return errors.New("ds.UniPtr == nil // type *Mki3dGLUni")
+	}
+
+	gl.UseProgram(ds.ShaderPtr.ProgramId)
+	gl.Uniform3fv(ds.ShaderPtr.LightUni, 1, &(ds.UniPtr.LightUni[0]))
+	gl.Uniform1f(ds.ShaderPtr.AmbientUni, ds.UniPtr.AmbientUni)
+
+	return nil
 }
 
 // InitVAO init the VAO field of ds. ds, ds.ShaderPtr  and ds.BufPtr must be not nil and previously initiated
@@ -50,7 +68,7 @@ func (ds *Mki3dDataShaderTr) InitVAO() (err error) {
 	}
 
 	if ds.ShaderPtr == nil {
-		return errors.New("ds.ShaderPtr == nil // type ")
+		return errors.New("ds.ShaderPtr == nil // type *Mki3dShaderTr")
 	}
 
 	gl.UseProgram(ds.ShaderPtr.ProgramId)

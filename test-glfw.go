@@ -87,6 +87,12 @@ func main() {
 	mki3dGLUni.SetFromMki3d(mki3dData, 100, 100)
 	fmt.Printf("%+v\n", mki3dGLUni)
 
+	mki3dDataShaderTrPtr, err := MakeMki3dDataShaderTr(mki3dShaderPtr.Tr, &(mki3dGLBufPtr.Tr), &mki3dGLUni)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%+v\n", *mki3dDataShaderTrPtr) // test
+
 	// callbacks
 	window.SetSizeCallback(
 		func(w *glfw.Window, width int, height int) {
