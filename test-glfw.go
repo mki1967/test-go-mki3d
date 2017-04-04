@@ -80,14 +80,22 @@ func main() {
 	fmt.Printf("%+v\n", *mki3dGLBufPtr) // test
 
 	// test ViewMatrix
-	fmt.Println(ViewMatrix(mki3dData.View))
+	// fmt.Println(ViewMatrix(mki3dData.View))
+
+	// test SetFromMki3d
+	var mki3dGLUni Mki3dGLUni
+	mki3dGLUni.SetFromMki3d(mki3dData, 100,100)
+	fmt.Printf("%+v\n", mki3dGLUni)
 
 	// callbacks
 	window.SetSizeCallback(
 		func(w *glfw.Window, width int, height int) {
 			gl.Viewport(0, 0, int32(width), int32(height))
 			fmt.Println(width, height)
-			fmt.Println(ProjectionMatrix(mki3dData.Projection, width, height))
+			// fmt.Println(ProjectionMatrix(mki3dData.Projection, width, height))
+			mki3dGLUni.SetFromMki3d(mki3dData, width, height )
+			fmt.Printf("%+v\n", mki3dGLUni)
+
 		})
 
 	previousTime := glfw.GetTime()

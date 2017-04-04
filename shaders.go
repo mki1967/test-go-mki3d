@@ -150,6 +150,7 @@ type Mki3dShaderTr struct {
 	ViewUni       int32
 	ModelUni      int32
 	LightUni      int32
+	AmbientUni      int32
 }
 
 // MakeMki3dShaderTr compiles  mki3d shader and

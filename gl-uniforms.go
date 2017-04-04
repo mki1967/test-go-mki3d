@@ -5,6 +5,7 @@ import (
 	// "github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/go-mki3d/mki3d"
+	"errors"
 	// "strings"
 )
 
@@ -15,8 +16,10 @@ type Mki3dGLUni struct {
 	ViewUni       mgl32.Mat4
 	ModelUni      mgl32.Mat4
 	LightUni      mgl32.Vec3
+	AmbientUni    float32
 }
 
+// ProjectionMatrix computes GL projection matrix from mki3d.ProjectionType, using width and height of current window
 func ProjectionMatrix(p mki3d.ProjectionType, width, height int) mgl32.Mat4 {
 	// make both width and height greater than zero
 	if width < 1 {
@@ -53,6 +56,8 @@ func Mat3(m mki3d.Matrix3dType) mgl32.Mat3 {
 	return q
 }
 
+
+// ViewMatrix computes GL view matrix from mki3d.ViewType
 func ViewMatrix(v mki3d.ViewType) mgl32.Mat4 {
 
 	mov := mgl32.Vec3(v.FocusPoint).Mul(-1)
@@ -68,12 +73,17 @@ func ViewMatrix(v mki3d.ViewType) mgl32.Mat4 {
 
 }
 
-func MakeMki3dGLUni(mki3dData *mki3d.Mki3dType) (glUniPtr *Mki3dGLUni, err error) {
-	var glUni Mki3dGLUni
+// SetFromMki3d sets the fields of glUni based on the data from mki3dData and on the width and height (of the display window)
+func (glUni *Mki3dGLUni) SetFromMki3d(mki3dData *mki3d.Mki3dType, width, height int) ( err error) {
+	if glUni == nil {
+		return errors.New( "glUni == nil" )
+	}
 	glUni.LightUni = mgl32.Vec3(mki3dData.Light.Vector)
+	glUni.AmbientUni = mki3dData.Light.AmbientFraction
 	glUni.ModelUni = mgl32.Ident4()
-	glUni.ProjectionUni = mgl32.Ident4()
+	glUni.ProjectionUni = ProjectionMatrix(mki3dData.Projection, width, height)
+	glUni.ViewUni = ViewMatrix(mki3dData.View)
 
 	// ...
-	return &glUni, nil
+	return nil
 }

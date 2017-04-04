@@ -14,10 +14,10 @@ import (
 type Mki3dGLBufTr struct {
 	// buffer objects in GL
 	// triangles:
-	triangleVertexCount int32 // the last argument for gl.DrawArrays
-	trianglePositionBuf uint32
-	triangleNormalBuf   uint32
-	triangleColorBuf    uint32
+	VertexCount int32 // the last argument for gl.DrawArrays
+	PositionBuf uint32
+	NormalBuf   uint32
+	ColorBuf    uint32
 }
 
 
@@ -26,9 +26,9 @@ type Mki3dGLBufTr struct {
 type Mki3dGLBufSeg struct {
 	// buffer objects in GL
 	// segments:
-	segmentVertexCount int32 // the last argument for gl.DrawArrays
-	segmentPositionBuf uint32
-	segmentColorBuf    uint32
+	VertexCount int32 // the last argument for gl.DrawArrays
+	PositionBuf uint32
+	ColorBuf    uint32
 }
 
 // Mki3dGLBuf contains references to GL buffers for shaders' input attributes
@@ -42,7 +42,7 @@ type Mki3dGLBuf struct {
 
 
 func (glBuf *Mki3dGLBufTr) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
-	glBuf.triangleVertexCount = int32(3 * len(mki3dData.Model.Triangles))
+	glBuf.VertexCount = int32(3 * len(mki3dData.Model.Triangles))
 	dataPos := make([]float32, 0, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
 	dataCol := make([]float32, 0, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
 	dataNor := make([]float32, 0, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
@@ -70,20 +70,20 @@ func (glBuf *Mki3dGLBufTr) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
 	fmt.Println(dataCol) // test
 	fmt.Println(dataNor) // test
 
-	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.trianglePositionBuf)
+	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.PositionBuf)
 	gl.BufferData(gl.ARRAY_BUFFER, len(dataPos)*4 /* 4 bytes per flat32 */, gl.Ptr(dataPos), gl.STATIC_DRAW)
 
-	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.triangleColorBuf)
+	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.ColorBuf)
 	gl.BufferData(gl.ARRAY_BUFFER, len(dataCol)*4 /* 4 bytes per flat32 */, gl.Ptr(dataCol), gl.STATIC_DRAW)
 
-	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.triangleNormalBuf)
+	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.NormalBuf)
 	gl.BufferData(gl.ARRAY_BUFFER, len(dataNor)*4 /* 4 bytes per flat32 */, gl.Ptr(dataNor), gl.STATIC_DRAW)
 
 	gl.BindBuffer(gl.ARRAY_BUFFER, 0) // unbind
 }
 
 func (glBuf *Mki3dGLBufSeg) LoadSegmentBufs(mki3dData *mki3d.Mki3dType) {
-	glBuf.segmentVertexCount = int32(2 * len(mki3dData.Model.Segments))
+	glBuf.VertexCount = int32(2 * len(mki3dData.Model.Segments))
 	dataPos := make([]float32, 0, 6*len(mki3dData.Model.Segments)) // each segment has 2*3 coordinates
 	dataCol := make([]float32, 0, 6*len(mki3dData.Model.Segments)) // each segment has 2*3 coordinates
 	i := 0
@@ -97,9 +97,9 @@ func (glBuf *Mki3dGLBufSeg) LoadSegmentBufs(mki3dData *mki3d.Mki3dType) {
 
 	fmt.Println(dataPos) // test
 	fmt.Println(dataCol) // test
-	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.segmentPositionBuf)
+	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.PositionBuf)
 	gl.BufferData(gl.ARRAY_BUFFER, len(dataPos)*4 /* 4 bytes per flat32 */, gl.Ptr(dataPos), gl.STATIC_DRAW)
-	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.segmentColorBuf)
+	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.ColorBuf)
 	gl.BufferData(gl.ARRAY_BUFFER, len(dataCol)*4 /* 4 bytes per flat32 */, gl.Ptr(dataCol), gl.STATIC_DRAW)
 	gl.BindBuffer(gl.ARRAY_BUFFER, 0) // unbind
 }
@@ -111,9 +111,9 @@ func MakeMki3dGLBufTr(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBufTr, err e
 	// TO DO: test for error ...
 
 	// assign buffer ids from vbo array
-	glBuf.trianglePositionBuf = vbo[0]
-	glBuf.triangleNormalBuf = vbo[1]
-	glBuf.triangleColorBuf = vbo[2]
+	glBuf.PositionBuf = vbo[0]
+	glBuf.NormalBuf = vbo[1]
+	glBuf.ColorBuf = vbo[2]
 
 	// load data from mki3dData
 	glBuf.LoadTriangleBufs(mki3dData)
@@ -129,8 +129,8 @@ func MakeMki3dGLBufSeg(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBufSeg, err
 	// TO DO: test for error ...
 
 	// assign buffer ids from vbo array
-	glBuf.segmentPositionBuf = vbo[0]
-	glBuf.segmentColorBuf = vbo[1]
+	glBuf.PositionBuf = vbo[0]
+	glBuf.ColorBuf = vbo[1]
 
 	// load data from mki3dData
 	glBuf.LoadSegmentBufs(mki3dData)
