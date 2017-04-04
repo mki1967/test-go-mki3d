@@ -10,21 +10,38 @@ import (
 
 // references to the objects defining the shape and parameters of mki3d object
 
-// Mki3dGLBuf contains references to GL buffers for shaders' input attributes
-type Mki3dGLBuf struct {
+// Mki3dGLBufTr contains references to GL triangle buffers for triangle shader's input attributes
+type Mki3dGLBufTr struct {
 	// buffer objects in GL
 	// triangles:
 	triangleVertexCount int32 // the last argument for gl.DrawArrays
 	trianglePositionBuf uint32
 	triangleNormalBuf   uint32
 	triangleColorBuf    uint32
+}
+
+
+
+// Mki3dGLBufSeg contains references to GL segment buffers for segment shader's input attributes
+type Mki3dGLBufSeg struct {
+	// buffer objects in GL
 	// segments:
 	segmentVertexCount int32 // the last argument for gl.DrawArrays
 	segmentPositionBuf uint32
 	segmentColorBuf    uint32
 }
 
-func (glBuf *Mki3dGLBuf) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
+// Mki3dGLBuf contains references to GL buffers for shaders' input attributes
+type Mki3dGLBuf struct {
+	// buffer objects in GL
+	// triangles:
+	Triangles Mki3dGLBufTr
+	// segments:
+	Segments Mki3dGLBufSeg
+}
+
+
+func (glBuf *Mki3dGLBufTr) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
 	glBuf.triangleVertexCount = int32(3 * len(mki3dData.Model.Triangles))
 	dataPos := make([]float32, 0, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
 	dataCol := make([]float32, 0, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
@@ -65,7 +82,7 @@ func (glBuf *Mki3dGLBuf) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
 	gl.BindBuffer(gl.ARRAY_BUFFER, 0) // unbind
 }
 
-func (glBuf *Mki3dGLBuf) LoadSegmentBufs(mki3dData *mki3d.Mki3dType) {
+func (glBuf *Mki3dGLBufSeg) LoadSegmentBufs(mki3dData *mki3d.Mki3dType) {
 	glBuf.segmentVertexCount = int32(2 * len(mki3dData.Model.Segments))
 	dataPos := make([]float32, 0, 6*len(mki3dData.Model.Segments)) // each segment has 2*3 coordinates
 	dataCol := make([]float32, 0, 6*len(mki3dData.Model.Segments)) // each segment has 2*3 coordinates
@@ -87,91 +104,52 @@ func (glBuf *Mki3dGLBuf) LoadSegmentBufs(mki3dData *mki3d.Mki3dType) {
 	gl.BindBuffer(gl.ARRAY_BUFFER, 0) // unbind
 }
 
-func MakeMki3dGLBuf(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBuf, err error) {
-	var glBuf Mki3dGLBuf
-	var vbo [5]uint32 // 5 is the number of buffers
-	gl.GenBuffers(5, &vbo[0])
+func MakeMki3dGLBufTr(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBufTr, err error) {
+	var glBuf Mki3dGLBufTr
+	var vbo [3]uint32 // 5 is the number of buffers
+	gl.GenBuffers(3, &vbo[0])
+	// TO DO: test for error ...
 
 	// assign buffer ids from vbo array
 	glBuf.trianglePositionBuf = vbo[0]
 	glBuf.triangleNormalBuf = vbo[1]
 	glBuf.triangleColorBuf = vbo[2]
-	glBuf.segmentPositionBuf = vbo[3]
-	glBuf.segmentColorBuf = vbo[4]
 
 	// load data from mki3dData
 	glBuf.LoadTriangleBufs(mki3dData)
-	glBuf.LoadSegmentBufs(mki3dData)
-	// ...
 
 	return &glBuf, nil
 }
 
-// Mki3dGLUni - values of parameters to be stored in shaders' uniforms
-type Mki3dGLUni struct {
-	ProjectionUni mgl32.Mat4
-	ViewUni       mgl32.Mat4
-	ModelUni      mgl32.Mat4
-	LightUni      mgl32.Vec3
+
+func MakeMki3dGLBufSeg(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBufSeg, err error) {
+	var glBuf Mki3dGLBufSeg
+	var vbo [2]uint32 // 5 is the number of buffers
+	gl.GenBuffers(2, &vbo[0])
+	// TO DO: test for error ...
+
+	// assign buffer ids from vbo array
+	glBuf.segmentPositionBuf = vbo[0]
+	glBuf.segmentColorBuf = vbo[1]
+
+	// load data from mki3dData
+	glBuf.LoadSegmentBufs(mki3dData)
+
+	return &glBuf, nil
 }
 
-func ProjectionMatrix(p mki3d.ProjectionType, width, height int) mgl32.Mat4 {
-	// make both width and height greater than zero
-	if width < 1 {
-		width = 1
+func MakeMki3dGLBuf(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBuf, err error) {
+
+	glSegBufPtr, err := MakeMki3dGLBufSeg( mki3dData )
+	if err != nil {
+		return nil, err
 	}
-	if height < 1 {
-		height = 1
+	glTrBufPtr, err := MakeMki3dGLBufTr( mki3dData )
+	if err != nil {
+		return nil, err
 	}
 
-	h := float32(height)
-	w := float32(width)
-	xx := p.ZoomY * h / w
-	yy := p.ZoomY
-	zz := (p.ZFar + p.ZNear) / (p.ZFar - p.ZNear)
-	zw := float32(1.0)
-	wz := -2 * p.ZFar * p.ZNear / (p.ZFar - p.ZNear)
-
-	var m mgl32.Mat4
-
-	m.SetRow(0, mgl32.Vec4{xx, 0, 0, 0})
-	m.SetRow(1, mgl32.Vec4{0, yy, 0, 0})
-	m.SetRow(2, mgl32.Vec4{0, 0, zz, wz})
-	m.SetRow(3, mgl32.Vec4{0, 0, zw, 0})
-	return m
-
+	glBuf := Mki3dGLBuf{ Triangles: *glTrBufPtr, Segments:  *glSegBufPtr }
+	return &glBuf, nil
 }
 
-// Mat3 converts Matrix3dType to mgl32.Mat3
-func Mat3(m mki3d.Matrix3dType) mgl32.Mat3 {
-	var q mgl32.Mat3
-	q.SetRow(0, mgl32.Vec3(m[0]))
-	q.SetRow(1, mgl32.Vec3(m[1]))
-	q.SetRow(2, mgl32.Vec3(m[2]))
-	return q
-}
-
-func ViewMatrix(v mki3d.ViewType) mgl32.Mat4 {
-
-	mov := mgl32.Vec3(v.FocusPoint).Mul(-1)
-
-	rot := Mat3(v.RotationMatrix).Mul(v.Scale)
-	scrSh := v.ScreenShift
-
-	m := rot.Mat4()
-	m.SetCol(3, mgl32.Vec4{mov.Dot(rot.Row(0)) + scrSh[0], mov.Dot(rot.Row(1)) + scrSh[1], mov.Dot(rot.Row(2)) + scrSh[2], 1.0})
-
-	//
-	return m
-
-}
-
-func MakeMki3dGLUni(mki3dData *mki3d.Mki3dType) (glUniPtr *Mki3dGLUni, err error) {
-	var glUni Mki3dGLUni
-	glUni.LightUni = mgl32.Vec3(mki3dData.Light.Vector)
-	glUni.ModelUni = mgl32.Ident4()
-	glUni.ProjectionUni = mgl32.Ident4()
-
-	// ...
-	return &glUni, nil
-}
