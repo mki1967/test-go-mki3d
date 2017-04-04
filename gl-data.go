@@ -20,8 +20,6 @@ type Mki3dGLBufTr struct {
 	ColorBuf    uint32
 }
 
-
-
 // Mki3dGLBufSeg contains references to GL segment buffers for segment shader's input attributes
 type Mki3dGLBufSeg struct {
 	// buffer objects in GL
@@ -39,7 +37,6 @@ type Mki3dGLBuf struct {
 	// segments:
 	Segments Mki3dGLBufSeg
 }
-
 
 func (glBuf *Mki3dGLBufTr) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
 	glBuf.VertexCount = int32(3 * len(mki3dData.Model.Triangles))
@@ -104,6 +101,7 @@ func (glBuf *Mki3dGLBufSeg) LoadSegmentBufs(mki3dData *mki3d.Mki3dType) {
 	gl.BindBuffer(gl.ARRAY_BUFFER, 0) // unbind
 }
 
+// MakeMki3dGLBufTr either returns pointer to a new Mki3dGLBufTr or an error
 func MakeMki3dGLBufTr(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBufTr, err error) {
 	var glBuf Mki3dGLBufTr
 	var vbo [3]uint32 // 5 is the number of buffers
@@ -121,7 +119,7 @@ func MakeMki3dGLBufTr(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBufTr, err e
 	return &glBuf, nil
 }
 
-
+// MakeMki3dGLBufSeg either returns pointer to a new Mki3dGLBufSeg or an error
 func MakeMki3dGLBufSeg(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBufSeg, err error) {
 	var glBuf Mki3dGLBufSeg
 	var vbo [2]uint32 // 5 is the number of buffers
@@ -138,18 +136,18 @@ func MakeMki3dGLBufSeg(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBufSeg, err
 	return &glBuf, nil
 }
 
+// MakeMki3dGLBuf either returns pointer to a new Mki3dGLBuf or an error
 func MakeMki3dGLBuf(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBuf, err error) {
 
-	glSegBufPtr, err := MakeMki3dGLBufSeg( mki3dData )
+	glSegBufPtr, err := MakeMki3dGLBufSeg(mki3dData)
 	if err != nil {
 		return nil, err
 	}
-	glTrBufPtr, err := MakeMki3dGLBufTr( mki3dData )
+	glTrBufPtr, err := MakeMki3dGLBufTr(mki3dData)
 	if err != nil {
 		return nil, err
 	}
 
-	glBuf := Mki3dGLBuf{ Triangles: *glTrBufPtr, Segments:  *glSegBufPtr }
+	glBuf := Mki3dGLBuf{Triangles: *glTrBufPtr, Segments: *glSegBufPtr}
 	return &glBuf, nil
 }
-

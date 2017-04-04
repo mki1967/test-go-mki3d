@@ -84,7 +84,7 @@ func main() {
 
 	// test SetFromMki3d
 	var mki3dGLUni Mki3dGLUni
-	mki3dGLUni.SetFromMki3d(mki3dData, 100,100)
+	mki3dGLUni.SetFromMki3d(mki3dData, 100, 100)
 	fmt.Printf("%+v\n", mki3dGLUni)
 
 	// callbacks
@@ -93,7 +93,7 @@ func main() {
 			gl.Viewport(0, 0, int32(width), int32(height))
 			fmt.Println(width, height)
 			// fmt.Println(ProjectionMatrix(mki3dData.Projection, width, height))
-			mki3dGLUni.SetFromMki3d(mki3dData, width, height )
+			mki3dGLUni.SetFromMki3d(mki3dData, width, height)
 			fmt.Printf("%+v\n", mki3dGLUni)
 
 		})

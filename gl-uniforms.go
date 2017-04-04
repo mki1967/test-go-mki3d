@@ -3,12 +3,11 @@ package main
 import (
 	// "fmt"
 	// "github.com/go-gl/gl/v3.3-core/gl"
+	"errors"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/go-mki3d/mki3d"
-	"errors"
 	// "strings"
 )
-
 
 // Mki3dGLUni - values of parameters to be stored in shaders' uniforms
 type Mki3dGLUni struct {
@@ -56,7 +55,6 @@ func Mat3(m mki3d.Matrix3dType) mgl32.Mat3 {
 	return q
 }
 
-
 // ViewMatrix computes GL view matrix from mki3d.ViewType
 func ViewMatrix(v mki3d.ViewType) mgl32.Mat4 {
 
@@ -74,9 +72,9 @@ func ViewMatrix(v mki3d.ViewType) mgl32.Mat4 {
 }
 
 // SetFromMki3d sets the fields of glUni based on the data from mki3dData and on the width and height (of the display window)
-func (glUni *Mki3dGLUni) SetFromMki3d(mki3dData *mki3d.Mki3dType, width, height int) ( err error) {
+func (glUni *Mki3dGLUni) SetFromMki3d(mki3dData *mki3d.Mki3dType, width, height int) (err error) {
 	if glUni == nil {
-		return errors.New( "glUni == nil" )
+		return errors.New("glUni == nil")
 	}
 	glUni.LightUni = mgl32.Vec3(mki3dData.Light.Vector)
 	glUni.AmbientUni = mki3dData.Light.AmbientFraction
