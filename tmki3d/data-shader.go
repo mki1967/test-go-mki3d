@@ -4,6 +4,7 @@ import (
 	// "fmt"
 	"errors"
 	"github.com/go-gl/gl/v3.3-core/gl"
+	"github.com/mki1967/go-mki3d/mki3d"
 )
 
 // DataShaderTr is a binding between data and shader for triangles
@@ -12,13 +13,14 @@ type DataShaderTr struct {
 	VAO       uint32         // GL Vertex Array Object
 	BufPtr    *GLBufTr  // pointer to GL buffers structure
 	UniPtr    *GLUni    // pointer to GL uniform parameters structure
+	Mki3dPtr    *mki3d.Mki3dType    // pointer to original Mki3dType data
 
 }
 
 // MakeDataShaderTr either returns a pointer to anewly created DataShaderTr or an error.
 // The parameters should be pointers to existing and initiated objects
 // MakeDataShaderTr inits its VAO
-func MakeDataShaderTr(sPtr *ShaderTr, bPtr *GLBufTr, uPtr *GLUni) (dsPtr *DataShaderTr, err error) {
+func MakeDataShaderTr(sPtr *ShaderTr, bPtr *GLBufTr, uPtr *GLUni, mPtr *mki3d.Mki3dType ) (dsPtr *DataShaderTr, err error) {
 	if sPtr == nil {
 		return nil, errors.New("sPtr == nil // type *ShaderTr ")
 	}
@@ -29,7 +31,11 @@ func MakeDataShaderTr(sPtr *ShaderTr, bPtr *GLBufTr, uPtr *GLUni) (dsPtr *DataSh
 		return nil, errors.New("uPtr == nil // type *GLUni ")
 	}
 
-	ds := DataShaderTr{ShaderPtr: sPtr, BufPtr: bPtr, UniPtr: uPtr}
+	if mPtr == nil {
+		return nil, errors.New("mPtr == nil // type *Mki3dType ")
+	}
+
+	ds := DataShaderTr{ShaderPtr: sPtr, BufPtr: bPtr, UniPtr: uPtr, Mki3dPtr: mPtr  }
 	err = ds.InitVAO()
 	if err != nil {
 		return nil, err

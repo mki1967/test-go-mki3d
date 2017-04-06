@@ -25,11 +25,11 @@ func main() {
 	// fmt.Println(vertexShaderT)
 	// fmt.Println(fragmentShader)
 
-	mki3dData, err := mki3d.ReadFile("noname.mki3d")
+	mki3dPtr, err := mki3d.ReadFile("noname.mki3d")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%v\n", mki3d.Stringify(mki3dData))
+	fmt.Printf("%v\n", mki3d.Stringify(mki3dPtr))
 
 	// fragments from https://github.com/go-gl/examples/blob/master/gl41core-cube/cube.go
 
@@ -73,7 +73,7 @@ func main() {
 
 	// test GLBuf
 
-	mki3dGLBufPtr, err := tmki3d.MakeGLBuf(mki3dData)
+	mki3dGLBufPtr, err := tmki3d.MakeGLBuf(mki3dPtr)
 	if err != nil {
 		panic(err)
 	}
@@ -81,15 +81,15 @@ func main() {
 	fmt.Printf("%+v\n", *mki3dGLBufPtr) // test
 
 	// test ViewMatrix
-	// fmt.Println(ViewMatrix(mki3dData.View))
+	// fmt.Println(ViewMatrix(mki3dPtr.View))
 
 	// test SetFromMki3d
 	/// var mki3dGLUni tmki3d.GLUni
-	/// mki3dGLUni.SetFromMki3d(mki3dData, 100, 100)
-	mki3dGLUniPtr, err := tmki3d.MakeGLUni(mki3dData, 100, 100)
+	/// mki3dGLUni.SetFromMki3d(mki3dPtr, 100, 100)
+	mki3dGLUniPtr, err := tmki3d.MakeGLUni(mki3dPtr, 100, 100)
 	fmt.Printf("%+v\n", *mki3dGLUniPtr)
 
-	mki3dDataShaderTrPtr, err := tmki3d.MakeDataShaderTr(mki3dShaderPtr.Tr, &(mki3dGLBufPtr.Tr), mki3dGLUniPtr)
+	mki3dDataShaderTrPtr, err := tmki3d.MakeDataShaderTr(mki3dShaderPtr.Tr, &(mki3dGLBufPtr.Tr), mki3dGLUniPtr, mki3dPtr)
 	if err != nil {
 		panic(err)
 	}
@@ -100,9 +100,9 @@ func main() {
 		func(w *glfw.Window, width int, height int) {
 			gl.Viewport(0, 0, int32(width), int32(height))
 			fmt.Println(width, height)
-			// fmt.Println(tmki3d.ProjectionMatrix(mki3dData.Projection, width, height))
-			// mki3dGLUni.SetFromMki3d(mki3dData, width, height)
-			mki3dGLUniPtr.ProjectionUni = tmki3d.ProjectionMatrix(mki3dData.Projection, width, height)
+			// fmt.Println(tmki3d.ProjectionMatrix(mki3dPtr.Projection, width, height))
+			// mki3dGLUni.SetFromMki3d(mki3dPtr, width, height)
+			mki3dGLUniPtr.ProjectionUni = tmki3d.ProjectionMatrix(mki3dPtr.Projection, width, height)
 			fmt.Printf("%+v\n", *mki3dGLUniPtr)
 
 		})
