@@ -29,7 +29,7 @@ out vec4 vColor;
 
 void main() {
     /* compute shaded color */
-    vec4 modelNormal=model*vec4(normal, 1);
+    vec4 modelNormal=model*vec4(normal, 0.0);
     float shade= abs( dot( modelNormal.xyz, light ) ); 
     vColor= (ambient+(1.0-ambient)*shade)*vec4(color, 1.0);
     /* compute projected position */
@@ -167,6 +167,8 @@ func MakeShaderTr() (shaderPtr *ShaderTr, err error) {
 	// set ProgramId
 	shader.ProgramId = program
 
+        gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00")) // test
+	
 	// set attributes
 	shader.PositionAttr = uint32(gl.GetAttribLocation(program, gl.Str("position\x00")))
 	shader.NormalAttr = uint32(gl.GetAttribLocation(program, gl.Str("normal\x00")))
@@ -177,6 +179,7 @@ func MakeShaderTr() (shaderPtr *ShaderTr, err error) {
 	shader.ViewUni = gl.GetUniformLocation(program, gl.Str("view\x00"))
 	shader.ModelUni = gl.GetUniformLocation(program, gl.Str("model\x00"))
 	shader.LightUni = gl.GetUniformLocation(program, gl.Str("light\x00"))
+	shader.AmbientUni = gl.GetUniformLocation(program, gl.Str("ambient\x00"))
 	return &shader, nil
 }
 

@@ -106,6 +106,8 @@ func main() {
 		mki3dGLUniPtr.ProjectionUni = tmki3d.ProjectionMatrix(mki3dPtr.Projection, width, height)
 		fmt.Printf("%+v\n", *mki3dGLUniPtr)
 
+		mki3dDataShaderTrPtr.DrawStage()
+
 	}
 
 	// setting callbacks
@@ -137,9 +139,11 @@ func main() {
 
 			gl.DrawArrays(gl.TRIANGLES, 0, 6*2*3)
 		*/
+		mki3dDataShaderTrPtr.DrawStage()
 
 		// Maintenance
 		window.SwapBuffers()
+		glfw.WaitEvents()
 		glfw.PollEvents()
 	}
 }

@@ -1,7 +1,7 @@
 package tmki3d
 
 import (
-	// "fmt"
+	"fmt" // tests
 	"errors"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/mki1967/go-mki3d/mki3d"
@@ -109,8 +109,8 @@ func (ds *DataShaderTr) UniProjectionToShader() (err error) {
 	return nil
 }
 
-// SetStageInShader initiates stage parameters in ds.ShaderPtr assuming that ds is a stage
-func (ds *DataShaderTr) SetStageInShader() (err error) {
+// InitStage initiates stage parameters in ds.ShaderPtr assuming that ds is a stage
+func (ds *DataShaderTr) InitStage() (err error) {
 	if ds.Mki3dPtr == nil {
 		return errors.New("ds.Mki3dPtr == nil // type *Mki3dType")
 	}
@@ -135,6 +135,21 @@ func (ds *DataShaderTr) SetStageInShader() (err error) {
 
 	return nil
 	
+}
+
+func (ds *DataShaderTr) DrawModel() {
+	ds.UniModelToShader()
+	gl.UseProgram(ds.ShaderPtr.ProgramId)
+	gl.BindVertexArray(ds.VAO)
+	gl.DrawArrays(gl.TRIANGLES, 0, ds.BufPtr.VertexCount)
+	fmt.Println( "ds.BufPtr.VertexCount: ", ds.BufPtr.VertexCount)
+	fmt.Println( "ds.VAO: ", ds.VAO)
+	gl.BindVertexArray(0)
+}
+
+func (ds *DataShaderTr) DrawStage() {
+	ds.InitStage()
+	ds.DrawModel()
 }
 
 // InitVAO init the VAO field of ds. ds, ds.ShaderPtr  and ds.BufPtr must be not nil and previously initiated

@@ -59,6 +59,8 @@ func ProjectionMatrix(p mki3d.ProjectionType, width, height int) mgl32.Mat4 {
 	m.SetRow(1, mgl32.Vec4{0, yy, 0, 0})
 	m.SetRow(2, mgl32.Vec4{0, 0, zz, wz})
 	m.SetRow(3, mgl32.Vec4{0, 0, zw, 0})
+
+	// m=mgl32.Perspective(mgl32.DegToRad(45.0), w/h, p.ZNear, p.ZFar) // test
 	return m
 
 }
