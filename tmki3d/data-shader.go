@@ -42,14 +42,13 @@ func MakeDataShaderTr(sPtr *ShaderTr, bPtr *GLBufTr, uPtr *GLUni, mPtr *mki3d.Mk
 	}
 
 	ds.InitVAO()
-	ds.LightToShader()
-	// OK
+
 	return &ds, nil
 
 }
 
-// LightUniToShader sets  light uniform parameters from ds.UniPtr to ds.ShaderPtr  (both must be not nil and previously initiated)
-func (ds *DataShaderTr) LightToShader() (err error) {
+// UniLightToShader sets  light uniform parameters from ds.UniPtr to ds.ShaderPtr  (both must be not nil and previously initiated)
+func (ds *DataShaderTr) UniLightToShader() (err error) {
 	if ds.ShaderPtr == nil {
 		return errors.New("ds.ShaderPtr == nil // type *ShaderTr")
 	}
@@ -62,6 +61,80 @@ func (ds *DataShaderTr) LightToShader() (err error) {
 	gl.Uniform1f(ds.ShaderPtr.AmbientUni, ds.UniPtr.AmbientUni)
 
 	return nil
+}
+
+
+// UniModelToShader sets uniform parameter from ds.UniPtr to ds.ShaderPtr
+func (ds *DataShaderTr) UniModelToShader() (err error) {
+	if ds.ShaderPtr == nil {
+		return errors.New("ds.ShaderPtr == nil // type *ShaderTr")
+	}
+	if ds.UniPtr == nil {
+		return errors.New("ds.UniPtr == nil // type *GLUni")
+	}
+
+	gl.UseProgram(ds.ShaderPtr.ProgramId)
+	gl.UniformMatrix4fv(ds.ShaderPtr.ModelUni, 1, false, &(ds.UniPtr.ModelUni[0]) )
+
+	return nil
+}
+
+// UniViewToShader sets uniform parameter from ds.UniPtr to ds.ShaderPtr
+func (ds *DataShaderTr) UniViewToShader() (err error) {
+	if ds.ShaderPtr == nil {
+		return errors.New("ds.ShaderPtr == nil // type *ShaderTr")
+	}
+	if ds.UniPtr == nil {
+		return errors.New("ds.UniPtr == nil // type *GLUni")
+	}
+
+	gl.UseProgram(ds.ShaderPtr.ProgramId)
+	gl.UniformMatrix4fv(ds.ShaderPtr.ViewUni, 1, false, &(ds.UniPtr.ViewUni[0]) )
+
+	return nil
+}
+
+// UniProjectionToShader sets uniform parameter from ds.UniPtr to ds.ShaderPtr 
+func (ds *DataShaderTr) UniProjectionToShader() (err error) {
+	if ds.ShaderPtr == nil {
+		return errors.New("ds.ShaderPtr == nil // type *ShaderTr")
+	}
+	if ds.UniPtr == nil {
+		return errors.New("ds.UniPtr == nil // type *GLUni")
+	}
+
+	gl.UseProgram(ds.ShaderPtr.ProgramId)
+	gl.UniformMatrix4fv(ds.ShaderPtr.ProjectionUni, 1, false, &(ds.UniPtr.ProjectionUni[0]) )
+
+	return nil
+}
+
+// SetStageInShader initiates stage parameters in ds.ShaderPtr assuming that ds is a stage
+func (ds *DataShaderTr) SetStageInShader() (err error) {
+	if ds.Mki3dPtr == nil {
+		return errors.New("ds.Mki3dPtr == nil // type *Mki3dType")
+	}
+
+	err = ds.UniProjectionToShader() // set projection
+	if err != nil {
+		return err
+	}
+	
+	err = ds.UniViewToShader() // set view
+	if err != nil {
+		return err
+	}
+	
+	err = ds.UniLightToShader() // set light - for triangles only
+	if err != nil {
+		return err
+	}
+
+	bg := ds.Mki3dPtr.BackgroundColor
+	gl.ClearColor(bg[0], bg[1], bg[2], 1.0)
+
+	return nil
+	
 }
 
 // InitVAO init the VAO field of ds. ds, ds.ShaderPtr  and ds.BufPtr must be not nil and previously initiated

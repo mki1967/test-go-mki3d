@@ -62,6 +62,8 @@ func main() {
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0.0, 0.0, 0.3, 1.0)
 
+	// callbacks
+
 	// test Shader
 	mki3dShaderPtr, err := tmki3d.MakeShader()
 	if err != nil {
@@ -86,7 +88,8 @@ func main() {
 	// test SetFromMki3d
 	/// var mki3dGLUni tmki3d.GLUni
 	/// mki3dGLUni.SetFromMki3d(mki3dPtr, 100, 100)
-	mki3dGLUniPtr, err := tmki3d.MakeGLUni(mki3dPtr, 100, 100)
+	width, height := window.GetSize()
+	mki3dGLUniPtr, err := tmki3d.MakeGLUni(mki3dPtr, width, height)
 	fmt.Printf("%+v\n", *mki3dGLUniPtr)
 
 	mki3dDataShaderTrPtr, err := tmki3d.MakeDataShaderTr(mki3dShaderPtr.Tr, &(mki3dGLBufPtr.Tr), mki3dGLUniPtr, mki3dPtr)
@@ -95,17 +98,18 @@ func main() {
 	}
 	fmt.Printf("%+v\n", *mki3dDataShaderTrPtr) // test
 
-	// callbacks
-	window.SetSizeCallback(
-		func(w *glfw.Window, width int, height int) {
-			gl.Viewport(0, 0, int32(width), int32(height))
-			fmt.Println(width, height)
-			// fmt.Println(tmki3d.ProjectionMatrix(mki3dPtr.Projection, width, height))
-			// mki3dGLUni.SetFromMki3d(mki3dPtr, width, height)
-			mki3dGLUniPtr.ProjectionUni = tmki3d.ProjectionMatrix(mki3dPtr.Projection, width, height)
-			fmt.Printf("%+v\n", *mki3dGLUniPtr)
+	SizeCallback := func(w *glfw.Window, width int, height int) {
+		gl.Viewport(0, 0, int32(width), int32(height))
+		fmt.Println(width, height)
+		// fmt.Println(tmki3d.ProjectionMatrix(mki3dPtr.Projection, width, height))
+		// mki3dGLUni.SetFromMki3d(mki3dPtr, width, height)
+		mki3dGLUniPtr.ProjectionUni = tmki3d.ProjectionMatrix(mki3dPtr.Projection, width, height)
+		fmt.Printf("%+v\n", *mki3dGLUniPtr)
 
-		})
+	}
+
+	// setting callbacks
+	window.SetSizeCallback(SizeCallback)
 
 	previousTime := glfw.GetTime()
 	// main loop
