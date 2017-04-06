@@ -18,6 +18,23 @@ type GLUni struct {
 	AmbientUni    float32
 }
 
+// MakeGLUni makes GLUni with values of uniforms computed from mki3dData and returns a pointer to it.
+func MakeGLUni(mki3dData *mki3d.Mki3dType, width, height int) (*GLUni, error) {
+	if mki3dData == nil {
+		return nil,  errors.New("mki3dData == nil")
+	}
+
+	var glUni GLUni
+	
+	err:= glUni.SetFromMki3d(mki3dData, width, height )
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &glUni, nil
+}
+
 // ProjectionMatrix computes GL projection matrix from mki3d.ProjectionType, using width and height of current window
 func ProjectionMatrix(p mki3d.ProjectionType, width, height int) mgl32.Mat4 {
 	// make both width and height greater than zero

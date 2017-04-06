@@ -10,7 +10,6 @@ import (
 	"github.com/mki1967/test-go-mki3d/tmki3d"
 	"log"
 	"runtime"
-	
 	// "github.com/go-gl/mathgl/mgl32"
 )
 
@@ -85,11 +84,12 @@ func main() {
 	// fmt.Println(ViewMatrix(mki3dData.View))
 
 	// test SetFromMki3d
-	var mki3dGLUni tmki3d.GLUni
-	mki3dGLUni.SetFromMki3d(mki3dData, 100, 100)
-	fmt.Printf("%+v\n", mki3dGLUni)
+	/// var mki3dGLUni tmki3d.GLUni
+	/// mki3dGLUni.SetFromMki3d(mki3dData, 100, 100)
+	mki3dGLUniPtr, err := tmki3d.MakeGLUni(mki3dData, 100, 100)
+	fmt.Printf("%+v\n", *mki3dGLUniPtr)
 
-	mki3dDataShaderTrPtr, err := tmki3d.MakeDataShaderTr(mki3dShaderPtr.Tr, &(mki3dGLBufPtr.Tr), &mki3dGLUni)
+	mki3dDataShaderTrPtr, err := tmki3d.MakeDataShaderTr(mki3dShaderPtr.Tr, &(mki3dGLBufPtr.Tr), mki3dGLUniPtr)
 	if err != nil {
 		panic(err)
 	}
@@ -102,8 +102,8 @@ func main() {
 			fmt.Println(width, height)
 			// fmt.Println(tmki3d.ProjectionMatrix(mki3dData.Projection, width, height))
 			// mki3dGLUni.SetFromMki3d(mki3dData, width, height)
-			mki3dGLUni.ProjectionUni=tmki3d.ProjectionMatrix(mki3dData.Projection, width, height)
-			fmt.Printf("%+v\n", mki3dGLUni)
+			mki3dGLUniPtr.ProjectionUni = tmki3d.ProjectionMatrix(mki3dData.Projection, width, height)
+			fmt.Printf("%+v\n", *mki3dGLUniPtr)
 
 		})
 

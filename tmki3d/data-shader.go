@@ -17,6 +17,7 @@ type DataShaderTr struct {
 
 // MakeDataShaderTr either returns a pointer to anewly created DataShaderTr or an error.
 // The parameters should be pointers to existing and initiated objects
+// MakeDataShaderTr inits its VAO
 func MakeDataShaderTr(sPtr *ShaderTr, bPtr *GLBufTr, uPtr *GLUni) (dsPtr *DataShaderTr, err error) {
 	if sPtr == nil {
 		return nil, errors.New("sPtr == nil // type *ShaderTr ")
