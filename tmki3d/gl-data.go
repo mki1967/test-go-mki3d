@@ -10,8 +10,8 @@ import (
 
 // references to the objects defining the shape and parameters of mki3d object
 
-// Mki3dGLBufTr contains references to GL triangle buffers for triangle shader's input attributes
-type Mki3dGLBufTr struct {
+// GLBufTr contains references to GL triangle buffers for triangle shader's input attributes
+type GLBufTr struct {
 	// buffer objects in GL
 	// triangles:
 	VertexCount int32 // the last argument for gl.DrawArrays
@@ -20,8 +20,8 @@ type Mki3dGLBufTr struct {
 	ColorBuf    uint32
 }
 
-// Mki3dGLBufSeg contains references to GL segment buffers for segment shader's input attributes
-type Mki3dGLBufSeg struct {
+// GLBufSeg contains references to GL segment buffers for segment shader's input attributes
+type GLBufSeg struct {
 	// buffer objects in GL
 	// segments:
 	VertexCount int32 // the last argument for gl.DrawArrays
@@ -29,16 +29,17 @@ type Mki3dGLBufSeg struct {
 	ColorBuf    uint32
 }
 
-// Mki3dGLBuf contains references to GL buffers for shaders' input attributes
-type Mki3dGLBuf struct {
+// GLBuf contains references to GL buffers for shaders' input attributes
+type GLBuf struct {
 	// buffer objects in GL
 	// triangles:
-	Tr Mki3dGLBufTr
+	Tr GLBufTr
 	// segments:
-	Seg Mki3dGLBufSeg
+	Seg GLBufSeg
 }
 
-func (glBuf *Mki3dGLBufTr) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
+// LoadTriangleBufs loads data from mki3dData to the GL buffers referenced by glBuf (and fills glBuf.NormalBuf with computed normals)
+func (glBuf *GLBufTr) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
 	glBuf.VertexCount = int32(3 * len(mki3dData.Model.Triangles))
 	dataPos := make([]float32, 0, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
 	dataCol := make([]float32, 0, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
@@ -79,7 +80,8 @@ func (glBuf *Mki3dGLBufTr) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
 	gl.BindBuffer(gl.ARRAY_BUFFER, 0) // unbind
 }
 
-func (glBuf *Mki3dGLBufSeg) LoadSegmentBufs(mki3dData *mki3d.Mki3dType) {
+// LoadSegmentBufs loads data from mki3dData to the GL buffers referenced by glBuf
+func (glBuf *GLBufSeg) LoadSegmentBufs(mki3dData *mki3d.Mki3dType) {
 	glBuf.VertexCount = int32(2 * len(mki3dData.Model.Segments))
 	dataPos := make([]float32, 0, 6*len(mki3dData.Model.Segments)) // each segment has 2*3 coordinates
 	dataCol := make([]float32, 0, 6*len(mki3dData.Model.Segments)) // each segment has 2*3 coordinates
@@ -101,9 +103,9 @@ func (glBuf *Mki3dGLBufSeg) LoadSegmentBufs(mki3dData *mki3d.Mki3dType) {
 	gl.BindBuffer(gl.ARRAY_BUFFER, 0) // unbind
 }
 
-// MakeMki3dGLBufTr either returns pointer to a new Mki3dGLBufTr or an error
-func MakeMki3dGLBufTr(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBufTr, err error) {
-	var glBuf Mki3dGLBufTr
+// MakeGLBufTr either returns pointer to a new GLBufTr or an error
+func MakeGLBufTr(mki3dData *mki3d.Mki3dType) (glBufPtr *GLBufTr, err error) {
+	var glBuf GLBufTr
 	var vbo [3]uint32 // 5 is the number of buffers
 	gl.GenBuffers(3, &vbo[0])
 	// TO DO: test for error ...
@@ -119,9 +121,9 @@ func MakeMki3dGLBufTr(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBufTr, err e
 	return &glBuf, nil
 }
 
-// MakeMki3dGLBufSeg either returns pointer to a new Mki3dGLBufSeg or an error
-func MakeMki3dGLBufSeg(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBufSeg, err error) {
-	var glBuf Mki3dGLBufSeg
+// MakeGLBufSeg either returns pointer to a new GLBufSeg or an error
+func MakeGLBufSeg(mki3dData *mki3d.Mki3dType) (glBufPtr *GLBufSeg, err error) {
+	var glBuf GLBufSeg
 	var vbo [2]uint32 // 5 is the number of buffers
 	gl.GenBuffers(2, &vbo[0])
 	// TO DO: test for error ...
@@ -136,18 +138,18 @@ func MakeMki3dGLBufSeg(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBufSeg, err
 	return &glBuf, nil
 }
 
-// MakeMki3dGLBuf either returns pointer to a new Mki3dGLBuf or an error
-func MakeMki3dGLBuf(mki3dData *mki3d.Mki3dType) (glBufPtr *Mki3dGLBuf, err error) {
+// MakeGLBuf either returns pointer to a new GLBuf or an error
+func MakeGLBuf(mki3dData *mki3d.Mki3dType) (glBufPtr *GLBuf, err error) {
 
-	glSegBufPtr, err := MakeMki3dGLBufSeg(mki3dData)
+	glSegBufPtr, err := MakeGLBufSeg(mki3dData)
 	if err != nil {
 		return nil, err
 	}
-	glTrBufPtr, err := MakeMki3dGLBufTr(mki3dData)
+	glTrBufPtr, err := MakeGLBufTr(mki3dData)
 	if err != nil {
 		return nil, err
 	}
 
-	glBuf := Mki3dGLBuf{Tr: *glTrBufPtr, Seg: *glSegBufPtr}
+	glBuf := GLBuf{Tr: *glTrBufPtr, Seg: *glSegBufPtr}
 	return &glBuf, nil
 }

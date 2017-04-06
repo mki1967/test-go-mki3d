@@ -138,7 +138,7 @@ func newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error)
 
 // structure for mki3d shader for drawing triangles
 // with references to attributes and uniform locations.
-type Mki3dShaderTr struct {
+type ShaderTr struct {
 	// program Id
 	ProgramId uint32
 	// locations of attributes
@@ -153,16 +153,16 @@ type Mki3dShaderTr struct {
 	AmbientUni    int32
 }
 
-// MakeMki3dShaderTr compiles  mki3d shader and
-// returns Mki3dShaderTr structure with reference to the program and its attributes and uniforms
+// MakeShaderTr compiles  mki3d shader and
+// returns ShaderTr structure with reference to the program and its attributes and uniforms
 // or error
-func MakeMki3dShaderTr() (shaderPtr *Mki3dShaderTr, err error) {
+func MakeShaderTr() (shaderPtr *ShaderTr, err error) {
 	program, err := newProgram(vertexShaderT, fragmentShader)
 	if err != nil {
 		return nil, err
 	}
 
-	var shader Mki3dShaderTr
+	var shader ShaderTr
 
 	// set ProgramId
 	shader.ProgramId = program
@@ -180,10 +180,10 @@ func MakeMki3dShaderTr() (shaderPtr *Mki3dShaderTr, err error) {
 	return &shader, nil
 }
 
-// TO DO: Mki3dShaderSeg, MakeMki3dShaderSeg() ...
-// Mki3dShaderSeg is a structure for mki3d shader for drawing segments
+// TO DO: ShaderSeg, MakeShaderSeg() ...
+// ShaderSeg is a structure for mki3d shader for drawing segments
 // with references to attributes and uniform locations.
-type Mki3dShaderSeg struct {
+type ShaderSeg struct {
 	// program Id
 	ProgramId uint32
 	// locations of attributes
@@ -195,16 +195,16 @@ type Mki3dShaderSeg struct {
 	ModelUni      int32
 }
 
-// MakeMki3dShaderSeg compiles  mki3d shader and
-// returns Mki3dShaderSeg structure with reference to the program and its attributes and uniforms
+// MakeShaderSeg compiles  mki3d shader and
+// returns ShaderSeg structure with reference to the program and its attributes and uniforms
 // or error
-func MakeMki3dShaderSeg() (shaderPtr *Mki3dShaderSeg, err error) {
+func MakeShaderSeg() (shaderPtr *ShaderSeg, err error) {
 	program, err := newProgram(vertexShaderS, fragmentShader)
 	if err != nil {
 		return nil, err
 	}
 
-	var shader Mki3dShaderSeg
+	var shader ShaderSeg
 
 	// set ProgramId
 	shader.ProgramId = program
@@ -221,22 +221,22 @@ func MakeMki3dShaderSeg() (shaderPtr *Mki3dShaderSeg, err error) {
 }
 
 // Both shaders in one struct
-type Mki3dShader struct {
-	Seg *Mki3dShaderSeg
-	Tr  *Mki3dShaderTr
+type Shader struct {
+	Seg *ShaderSeg
+	Tr  *ShaderTr
 }
 
-func MakeMki3dShader() (shaderPtr *Mki3dShader, err error) {
-	shaderSeg, err := MakeMki3dShaderSeg()
+func MakeShader() (shaderPtr *Shader, err error) {
+	shaderSeg, err := MakeShaderSeg()
 	if err != nil {
 		return nil, err
 	}
 
-	shaderTr, err := MakeMki3dShaderTr()
+	shaderTr, err := MakeShaderTr()
 	if err != nil {
 		return nil, err
 	}
 
-	return &Mki3dShader{Seg: shaderSeg, Tr: shaderTr}, err
+	return &Shader{Seg: shaderSeg, Tr: shaderTr}, err
 
 }

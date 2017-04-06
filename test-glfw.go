@@ -63,8 +63,8 @@ func main() {
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0.0, 0.0, 0.3, 1.0)
 
-	// test Mki3dShader
-	mki3dShaderPtr, err := tmki3d.MakeMki3dShader()
+	// test Shader
+	mki3dShaderPtr, err := tmki3d.MakeShader()
 	if err != nil {
 		panic(err)
 	}
@@ -72,9 +72,9 @@ func main() {
 	fmt.Printf("%+v\n", mki3dShaderPtr.Seg) // test
 	fmt.Printf("%+v\n", mki3dShaderPtr.Tr)  // test
 
-	// test Mki3dGLBuf
+	// test GLBuf
 
-	mki3dGLBufPtr, err := tmki3d.MakeMki3dGLBuf(mki3dData)
+	mki3dGLBufPtr, err := tmki3d.MakeGLBuf(mki3dData)
 	if err != nil {
 		panic(err)
 	}
@@ -85,11 +85,11 @@ func main() {
 	// fmt.Println(ViewMatrix(mki3dData.View))
 
 	// test SetFromMki3d
-	var mki3dGLUni tmki3d.Mki3dGLUni
+	var mki3dGLUni tmki3d.GLUni
 	mki3dGLUni.SetFromMki3d(mki3dData, 100, 100)
 	fmt.Printf("%+v\n", mki3dGLUni)
 
-	mki3dDataShaderTrPtr, err := tmki3d.MakeMki3dDataShaderTr(mki3dShaderPtr.Tr, &(mki3dGLBufPtr.Tr), &mki3dGLUni)
+	mki3dDataShaderTrPtr, err := tmki3d.MakeDataShaderTr(mki3dShaderPtr.Tr, &(mki3dGLBufPtr.Tr), &mki3dGLUni)
 	if err != nil {
 		panic(err)
 	}
@@ -100,8 +100,9 @@ func main() {
 		func(w *glfw.Window, width int, height int) {
 			gl.Viewport(0, 0, int32(width), int32(height))
 			fmt.Println(width, height)
-			// fmt.Println(ProjectionMatrix(mki3dData.Projection, width, height))
-			mki3dGLUni.SetFromMki3d(mki3dData, width, height)
+			// fmt.Println(tmki3d.ProjectionMatrix(mki3dData.Projection, width, height))
+			// mki3dGLUni.SetFromMki3d(mki3dData, width, height)
+			mki3dGLUni.ProjectionUni=tmki3d.ProjectionMatrix(mki3dData.Projection, width, height)
 			fmt.Printf("%+v\n", mki3dGLUni)
 
 		})

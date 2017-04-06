@@ -6,29 +6,29 @@ import (
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
-// Mki3dDataShaderTr is a binding between data and shader for triangles
-type Mki3dDataShaderTr struct {
-	ShaderPtr *Mki3dShaderTr // pointer to the GL shader program structure
+// DataShaderTr is a binding between data and shader for triangles
+type DataShaderTr struct {
+	ShaderPtr *ShaderTr // pointer to the GL shader program structure
 	VAO       uint32         // GL Vertex Array Object
-	BufPtr    *Mki3dGLBufTr  // pointer to GL buffers structure
-	UniPtr    *Mki3dGLUni    // pointer to GL uniform parameters structure
+	BufPtr    *GLBufTr  // pointer to GL buffers structure
+	UniPtr    *GLUni    // pointer to GL uniform parameters structure
 
 }
 
-// MakeMki3dDataShaderTr either returns a pointer to anewly created Mki3dDataShaderTr or an error.
+// MakeDataShaderTr either returns a pointer to anewly created DataShaderTr or an error.
 // The parameters should be pointers to existing and initiated objects
-func MakeMki3dDataShaderTr(sPtr *Mki3dShaderTr, bPtr *Mki3dGLBufTr, uPtr *Mki3dGLUni) (dsPtr *Mki3dDataShaderTr, err error) {
+func MakeDataShaderTr(sPtr *ShaderTr, bPtr *GLBufTr, uPtr *GLUni) (dsPtr *DataShaderTr, err error) {
 	if sPtr == nil {
-		return nil, errors.New("sPtr == nil // type *Mki3dShaderTr ")
+		return nil, errors.New("sPtr == nil // type *ShaderTr ")
 	}
 	if bPtr == nil {
-		return nil, errors.New("bPtr == nil // type *Mki3dGLBufTr ")
+		return nil, errors.New("bPtr == nil // type *GLBufTr ")
 	}
 	if uPtr == nil {
-		return nil, errors.New("uPtr == nil // type *Mki3dGLUni ")
+		return nil, errors.New("uPtr == nil // type *GLUni ")
 	}
 
-	ds := Mki3dDataShaderTr{ShaderPtr: sPtr, BufPtr: bPtr, UniPtr: uPtr}
+	ds := DataShaderTr{ShaderPtr: sPtr, BufPtr: bPtr, UniPtr: uPtr}
 	err = ds.InitVAO()
 	if err != nil {
 		return nil, err
@@ -42,12 +42,12 @@ func MakeMki3dDataShaderTr(sPtr *Mki3dShaderTr, bPtr *Mki3dGLBufTr, uPtr *Mki3dG
 }
 
 // LightUniToShader sets  light uniform parameters from ds.UniPtr to ds.ShaderPtr  (both must be not nil and previously initiated)
-func (ds *Mki3dDataShaderTr) LightToShader() (err error) {
+func (ds *DataShaderTr) LightToShader() (err error) {
 	if ds.ShaderPtr == nil {
-		return errors.New("ds.ShaderPtr == nil // type *Mki3dShaderTr")
+		return errors.New("ds.ShaderPtr == nil // type *ShaderTr")
 	}
 	if ds.UniPtr == nil {
-		return errors.New("ds.UniPtr == nil // type *Mki3dGLUni")
+		return errors.New("ds.UniPtr == nil // type *GLUni")
 	}
 
 	gl.UseProgram(ds.ShaderPtr.ProgramId)
@@ -58,17 +58,17 @@ func (ds *Mki3dDataShaderTr) LightToShader() (err error) {
 }
 
 // InitVAO init the VAO field of ds. ds, ds.ShaderPtr  and ds.BufPtr must be not nil and previously initiated
-func (ds *Mki3dDataShaderTr) InitVAO() (err error) {
+func (ds *DataShaderTr) InitVAO() (err error) {
 	if ds == nil {
-		return errors.New("ds == nil // type  *Mki3dDataShaderTr ")
+		return errors.New("ds == nil // type  *DataShaderTr ")
 	}
 
 	if ds.BufPtr == nil {
-		return errors.New("ds.BufPtr == nil // type *Mki3dGLBufTr")
+		return errors.New("ds.BufPtr == nil // type *GLBufTr")
 	}
 
 	if ds.ShaderPtr == nil {
-		return errors.New("ds.ShaderPtr == nil // type *Mki3dShaderTr")
+		return errors.New("ds.ShaderPtr == nil // type *ShaderTr")
 	}
 
 	gl.UseProgram(ds.ShaderPtr.ProgramId)

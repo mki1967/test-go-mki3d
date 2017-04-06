@@ -9,8 +9,8 @@ import (
 	// "strings"
 )
 
-// Mki3dGLUni - values of parameters to be stored in shaders' uniforms
-type Mki3dGLUni struct {
+// GLUni - values of parameters to be stored in shaders' uniforms
+type GLUni struct {
 	ProjectionUni mgl32.Mat4
 	ViewUni       mgl32.Mat4
 	ModelUni      mgl32.Mat4
@@ -72,7 +72,7 @@ func ViewMatrix(v mki3d.ViewType) mgl32.Mat4 {
 }
 
 // SetFromMki3d sets the fields of glUni based on the data from mki3dData and on the width and height (of the display window)
-func (glUni *Mki3dGLUni) SetFromMki3d(mki3dData *mki3d.Mki3dType, width, height int) (err error) {
+func (glUni *GLUni) SetFromMki3d(mki3dData *mki3d.Mki3dType, width, height int) (err error) {
 	if glUni == nil {
 		return errors.New("glUni == nil")
 	}
