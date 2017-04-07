@@ -1,4 +1,4 @@
-// run in the source code directory with: go run *.go
+// run in the source code directory with: go run *.go  <filename>.mki3d
 
 package main
 

@@ -26,7 +26,17 @@ func KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action,
 
 	switch {
 
-	/* rotate */
+	/* rotate model */
+	case key == glfw.KeyRight && mods == glfw.ModControl:
+		DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DY(angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
+	case key == glfw.KeyLeft && mods == glfw.ModControl:
+		DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DY(-angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
+	case key == glfw.KeyUp && mods == glfw.ModControl:
+		DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DX(-angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
+	case key == glfw.KeyDown && mods == glfw.ModControl:
+		DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DX(angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
+
+	/* rotate view */
 	case key == glfw.KeyRight && mods == 0:
 		DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DY(-angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeyLeft && mods == 0:
@@ -36,7 +46,21 @@ func KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action,
 	case key == glfw.KeyDown && mods == 0:
 		DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DX(-angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
 
-		/* move */
+		/* move model*/
+	case key == glfw.KeyRight && mods == glfw.ModControl|glfw.ModShift:
+		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
+	case key == glfw.KeyLeft && mods == glfw.ModControl|glfw.ModShift:
+		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(-step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
+	case key == glfw.KeyUp && mods == glfw.ModControl|glfw.ModShift:
+		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
+	case key == glfw.KeyDown && mods == glfw.ModControl|glfw.ModShift:
+		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, -step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
+	case key == glfw.KeyF && mods == glfw.ModControl|glfw.ModShift:
+		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, step).Mul4(DataShaderPtr.UniPtr.ViewUni)
+	case key == glfw.KeyB && mods == glfw.ModControl|glfw.ModShift:
+		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, -step).Mul4(DataShaderPtr.UniPtr.ViewUni)
+
+		/* move view*/
 	case key == glfw.KeyRight && mods == glfw.ModShift:
 		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(-step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeyLeft && mods == glfw.ModShift:
@@ -53,5 +77,10 @@ func KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action,
 		fallthrough
 	case key == glfw.KeyB && mods == 0:
 		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, step).Mul4(DataShaderPtr.UniPtr.ViewUni)
+
+		/* light */
+	case key == glfw.KeyL && mods == 0:
+		DataShaderPtr.UniPtr.LightUni = DataShaderPtr.UniPtr.ViewUni.Mat3().Inv().Mul3x1(mgl32.Vec3{0, 0, 1}).Normalize()
+
 	}
 }
