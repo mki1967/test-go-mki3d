@@ -17,7 +17,7 @@ type DataShaderTr struct {
 
 }
 
-// DataShaderSeg is a binding between data and a shader for triangles
+// DataShaderSeg is a binding between data and a shader for segments
 type DataShaderSeg struct {
 	ShaderPtr *ShaderSeg // pointer to the GL shader program structure
 	VAO       uint32         // GL Vertex Array Object
@@ -25,6 +25,46 @@ type DataShaderSeg struct {
 	UniPtr    *GLUni    // pointer to GL uniform parameters structure
 	Mki3dPtr    *mki3d.Mki3dType    // pointer to original Mki3dType data
 
+}
+
+
+// DataShader contains SegPtr (a pointer to binding between data and a shader for segments) and
+// Tr (a pointer to  binding between data and a shader for triangles)
+type DataShader struct {
+	Mki3dPtr *mki3d.Mki3dType // redundant link to mki3d data
+	UniPtr *GLUni // redundant link to uniforms 
+	SegPtr *DataShaderSeg
+	TrPtr  *DataShaderTr
+}
+
+// MakeDataShader creates DataShader with all required substructures for given ShaderSeg and mki3d.Mki3dType.
+// Parameters witdh and height (of the display window) are used for computing projection matrix.
+func MakeDataShader(sPtr *Shader, mPtr *mki3d.Mki3dType, width, height int ) (dsPtr *DataShader, err error) {
+	uPtr, err:= MakeGLUni(mPtr, width, height ) // uniforms
+	if err != nil {
+		return nil, err
+	}
+  
+	bPtr, err:= MakeGLBuf(mPtr) // data buffers
+	if err != nil {
+		return nil, err
+	}
+	
+	
+	segPtr, err:= MakeDataShaderSeg( sPtr.SegPtr , bPtr.SegPtr , uPtr , mPtr )
+	if err != nil {
+		return nil, err
+	}
+
+	trPtr, err:=  MakeDataShaderTr( sPtr.TrPtr , bPtr.TrPtr , uPtr , mPtr )
+	if err != nil {
+		return nil, err
+	}
+
+        ds := DataShader{ SegPtr: segPtr, TrPtr: trPtr, Mki3dPtr: mPtr, UniPtr: uPtr }
+
+	return &ds, nil
+	
 }
 
 // MakeDataShaderTr either returns a pointer to anewly created DataShaderTr or an error.
@@ -249,6 +289,34 @@ func (ds *DataShaderSeg) InitStage() (err error) {
 	
 }
 
+// InitStage initiates stage parameters assuming that ds is a stage
+func (ds *DataShader) InitStage() (err error) {
+	if ds.SegPtr == nil {
+		return errors.New("ds.Mki3dPtr == nil // type *Mki3dType")
+	}
+
+	err = ds.SegPtr.InitStage()
+	if err != nil {
+		return err
+	}
+
+	if ds.TrPtr == nil {
+		return errors.New("ds.Mki3dPtr == nil // type *Mki3dType")
+	}
+	err = ds.TrPtr.InitStage()
+	if err != nil {
+		return err
+	}
+
+	
+	bg := ds.Mki3dPtr.BackgroundColor       
+	gl.ClearColor(bg[0], bg[1], bg[2], 1.0)
+
+	return nil
+	
+}
+
+// Draw a model (triangles)
 func (ds *DataShaderTr) DrawModel() {
 	if ds.BufPtr.VertexCount == 0 {
 		return // nothing to draw
@@ -262,6 +330,7 @@ func (ds *DataShaderTr) DrawModel() {
 	gl.BindVertexArray(0)
 }
 
+// Draw a model (segments)
 func (ds *DataShaderSeg) DrawModel() {
 	if ds.BufPtr.VertexCount == 0 {
 		return // nothing to draw
@@ -275,15 +344,33 @@ func (ds *DataShaderSeg) DrawModel() {
 	gl.BindVertexArray(0)
 }
 
+// Draw a model (segments and triangles)
+func (ds *DataShader) DrawModel() {
+	ds.SegPtr.DrawModel()
+	ds.TrPtr.DrawModel()
+}
+
+// Draw a stage (triangles).
+// Use it once before drawing other models in the stage
 func (ds *DataShaderTr) DrawStage() {
 	ds.InitStage()
 	ds.DrawModel()
 }
 
+// Draw a stage (segments).
 func (ds *DataShaderSeg) DrawStage() {
 	ds.InitStage()
 	ds.DrawModel()
 }
+
+// Draw a stage.
+// Use it once before drawing other models in the stage
+func (ds *DataShader) DrawStage() {
+	// first draw triangles, then segments
+	ds.TrPtr.DrawStage()
+	ds.SegPtr.DrawStage()
+}
+
 
 // InitVAO init the VAO field of ds. ds, ds.ShaderPtr  and ds.BufPtr must be not nil and previously initiated
 func (ds *DataShaderTr) InitVAO() (err error) {
@@ -359,3 +446,4 @@ func (ds *DataShaderSeg) InitVAO() (err error) {
 	return nil
 
 }
+

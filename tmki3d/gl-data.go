@@ -33,9 +33,9 @@ type GLBufSeg struct {
 type GLBuf struct {
 	// buffer objects in GL
 	// triangles:
-	Tr GLBufTr
+	TrPtr  *GLBufTr
 	// segments:
-	Seg GLBufSeg
+	SegPtr *GLBufSeg
 }
 
 // LoadTriangleBufs loads data from mki3dData to the GL buffers referenced by glBuf (and fills glBuf.NormalBuf with computed normals)
@@ -150,6 +150,6 @@ func MakeGLBuf(mki3dData *mki3d.Mki3dType) (glBufPtr *GLBuf, err error) {
 		return nil, err
 	}
 
-	glBuf := GLBuf{Tr: *glTrBufPtr, Seg: *glSegBufPtr}
+	glBuf := GLBuf{TrPtr: glTrBufPtr, SegPtr: glSegBufPtr}
 	return &glBuf, nil
 }
