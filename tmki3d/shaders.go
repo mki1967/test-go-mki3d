@@ -3,8 +3,6 @@ package tmki3d
 import (
 	"fmt"
 	"github.com/go-gl/gl/v3.3-core/gl"
-	// "github.com/go-gl/mathgl/mgl32"
-	// "github.com/mki1967/go-mki3d/mki3d"
 	"strings"
 )
 
@@ -167,8 +165,8 @@ func MakeShaderTr() (shaderPtr *ShaderTr, err error) {
 	// set ProgramId
 	shader.ProgramId = program
 
-        gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00")) // test
-	
+	gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00")) // test
+
 	// set attributes
 	shader.PositionAttr = uint32(gl.GetAttribLocation(program, gl.Str("position\x00")))
 	shader.NormalAttr = uint32(gl.GetAttribLocation(program, gl.Str("normal\x00")))
@@ -183,7 +181,6 @@ func MakeShaderTr() (shaderPtr *ShaderTr, err error) {
 	return &shader, nil
 }
 
-// TO DO: ShaderSeg, MakeShaderSeg() ...
 // ShaderSeg is a structure for mki3d shader for drawing segments
 // with references to attributes and uniform locations.
 type ShaderSeg struct {
@@ -200,7 +197,7 @@ type ShaderSeg struct {
 
 // MakeShaderSeg compiles  mki3d shader and
 // returns ShaderSeg structure with reference to the program and its attributes and uniforms
-// or error
+// or error.
 func MakeShaderSeg() (shaderPtr *ShaderSeg, err error) {
 	program, err := newProgram(vertexShaderS, fragmentShader)
 	if err != nil {
@@ -223,12 +220,13 @@ func MakeShaderSeg() (shaderPtr *ShaderSeg, err error) {
 	return &shader, nil
 }
 
-// Both shaders in one struct
+// Both shaders in one struct.
 type Shader struct {
 	SegPtr *ShaderSeg
 	TrPtr  *ShaderTr
 }
 
+// Creates both shaders at once and returns in Shader structure
 func MakeShader() (shaderPtr *Shader, err error) {
 	shaderSeg, err := MakeShaderSeg()
 	if err != nil {

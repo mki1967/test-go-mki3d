@@ -1,4 +1,4 @@
-// run with: go run test-glfw.go shaders.go
+// run in the source code directory with: go run *.go
 
 package main
 
@@ -21,15 +21,16 @@ func init() {
 const windowWidth = 800
 const windowHeight = 600
 
-func main() {
-	// fmt.Println(vertexShaderT)
-	// fmt.Println(fragmentShader)
+var DataShaderPtr *tmki3d.DataShader // global variable in the main package
 
+func main() {
+
+	// Load mki3d data from a file
 	mki3dPtr, err := mki3d.ReadFile("noname.mki3d")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%v\n", mki3d.Stringify(mki3dPtr))
+	// fmt.Printf("%v\n", mki3d.Stringify(mki3dPtr)) // for tests ...
 
 	// fragments from https://github.com/go-gl/examples/blob/master/gl41core-cube/cube.go
 
@@ -43,7 +44,7 @@ func main() {
 	glfw.WindowHint(glfw.ContextVersionMinor, 3)
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
-	glfw.WindowHint(glfw.Samples, 4) // test quality
+	glfw.WindowHint(glfw.Samples, 4) // try multisampling for better quality ...
 	window, err := glfw.CreateWindow(windowWidth, windowHeight, "Cube", nil, nil)
 	if err != nil {
 		panic(err)
@@ -59,67 +60,27 @@ func main() {
 	fmt.Println("OpenGL version", version)
 
 	// Configure global settings
-	gl.Enable(gl.MULTISAMPLE) // test (probably not needed ...)
+	gl.Enable(gl.MULTISAMPLE) // probably not needed ...
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0.0, 0.0, 0.3, 1.0)
 
 	// callbacks
 
-	// test Shader
+	// Create both (segment and triangle) shaders in single structure
 	mki3dShaderPtr, err := tmki3d.MakeShader()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%+v\n", *mki3dShaderPtr)       // test
-	fmt.Printf("%+v\n", mki3dShaderPtr.SegPtr) // test
-	fmt.Printf("%+v\n", mki3dShaderPtr.TrPtr)  // test
-	/*
-		// test GLBuf
 
-		mki3dGLBufPtr, err := tmki3d.MakeGLBuf(mki3dPtr)
-		if err != nil {
-			panic(err)
-		}
-
-		fmt.Printf("%+v\n", *mki3dGLBufPtr) // test
-
-		// test ViewMatrix
-		// fmt.Println(ViewMatrix(mki3dPtr.View))
-
-		// test SetFromMki3d
-		/// var mki3dGLUni tmki3d.GLUni
-		/// mki3dGLUni.SetFromMki3d(mki3dPtr, 100, 100)
-		width, height := window.GetSize()
-		mki3dGLUniPtr, err := tmki3d.MakeGLUni(mki3dPtr, width, height)
-		fmt.Printf("%+v\n", *mki3dGLUniPtr)
-
-		mki3dDataShaderTrPtr, err := tmki3d.MakeDataShaderTr(mki3dShaderPtr.TrPtr, mki3dGLBufPtr.TrPtr, mki3dGLUniPtr, mki3dPtr)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("%+v\n", *mki3dDataShaderTrPtr) // test
-
-		mki3dDataShaderSegPtr, err := tmki3d.MakeDataShaderSeg(mki3dShaderPtr.SegPtr, mki3dGLBufPtr.SegPtr, mki3dGLUniPtr, mki3dPtr)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("%+v\n", *mki3dDataShaderSegPtr) // test
-	*/
-
+	// Get current width and height of the window for MakeDataShader
 	width, height := window.GetSize()
 	mki3dDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, mki3dPtr, width, height)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%+v\n", *mki3dDataShaderPtr) // test
 
-	SizeCallback := func(w *glfw.Window, width int, height int) {
-		gl.Viewport(0, 0, int32(width), int32(height)) // inform GL about resize
-		fmt.Println(width, height)
-		mki3dDataShaderPtr.UniPtr.ProjectionUni = tmki3d.ProjectionMatrix(mki3dPtr.Projection, width, height) // recompute projection matrix
-		fmt.Printf("%+v\n", *mki3dDataShaderPtr.UniPtr)
-	}
+	DataShaderPtr = mki3dDataShaderPtr // set the global variable
 
 	// setting callbacks
 	window.SetSizeCallback(SizeCallback)
@@ -127,7 +88,6 @@ func main() {
 	previousTime := glfw.GetTime()
 	// main loop
 	for !window.ShouldClose() {
-		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT) // to be moved to redraw ?
 
 		// Update
 		time := glfw.GetTime()
@@ -135,26 +95,12 @@ func main() {
 		previousTime = time
 		_ = elapsed // do not forget!
 
-		/*
-			angle += elapsed
-			model = mgl32.HomogRotate3D(float32(angle), mgl32.Vec3{0, 1, 0})
-
-			// Render
-			gl.UseProgram(program)
-			gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
-
-			gl.BindVertexArray(vao)
-
-			gl.ActiveTexture(gl.TEXTURE0)
-			gl.BindTexture(gl.TEXTURE_2D, texture)
-
-			gl.DrawArrays(gl.TRIANGLES, 0, 6*2*3)
-		*/
+		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT) // to be moved to redraw ?
 		mki3dDataShaderPtr.DrawStage()
 
 		// Maintenance
 		window.SwapBuffers()
 		glfw.WaitEvents()
-		glfw.PollEvents()
+		// glfw.PollEvents()
 	}
 }

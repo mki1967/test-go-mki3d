@@ -1,11 +1,9 @@
 package tmki3d
 
 import (
-	"fmt"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/go-mki3d/mki3d"
-	// "strings"
 )
 
 // references to the objects defining the shape and parameters of mki3d object
@@ -33,7 +31,7 @@ type GLBufSeg struct {
 type GLBuf struct {
 	// buffer objects in GL
 	// triangles:
-	TrPtr  *GLBufTr
+	TrPtr *GLBufTr
 	// segments:
 	SegPtr *GLBufSeg
 }
@@ -54,7 +52,6 @@ func (glBuf *GLBufTr) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
 		if normal.Dot(normal) > 0 {
 			normal = normal.Normalize()
 		}
-		// fmt.Println( "normal: ", normal ) /// test ...
 		// append to buffers
 		for j := 0; j < 3; j++ {
 			dataPos = append(dataPos, triangle[j].Position[0:3]...)
@@ -64,10 +61,7 @@ func (glBuf *GLBufTr) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
 		}
 	}
 
-	fmt.Println(dataPos) // test
-	fmt.Println(dataCol) // test
-	fmt.Println(dataNor) // test
-
+	/* transfer data to the GL memory */
 	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.PositionBuf)
 	gl.BufferData(gl.ARRAY_BUFFER, len(dataPos)*4 /* 4 bytes per flat32 */, gl.Ptr(dataPos), gl.STATIC_DRAW)
 
@@ -94,8 +88,7 @@ func (glBuf *GLBufSeg) LoadSegmentBufs(mki3dData *mki3d.Mki3dType) {
 		}
 	}
 
-	fmt.Println(dataPos) // test
-	fmt.Println(dataCol) // test
+	/* transfer data to the GL memory */
 	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.PositionBuf)
 	gl.BufferData(gl.ARRAY_BUFFER, len(dataPos)*4 /* 4 bytes per flat32 */, gl.Ptr(dataPos), gl.STATIC_DRAW)
 	gl.BindBuffer(gl.ARRAY_BUFFER, glBuf.ColorBuf)

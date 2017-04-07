@@ -1,12 +1,9 @@
 package tmki3d
 
 import (
-	// "fmt"
-	// "github.com/go-gl/gl/v3.3-core/gl"
 	"errors"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/go-mki3d/mki3d"
-	// "strings"
 )
 
 // GLUni - values of parameters to be stored in shaders' uniforms
@@ -21,12 +18,12 @@ type GLUni struct {
 // MakeGLUni makes GLUni with values of uniforms computed from mki3dData and returns a pointer to it.
 func MakeGLUni(mki3dData *mki3d.Mki3dType, width, height int) (*GLUni, error) {
 	if mki3dData == nil {
-		return nil,  errors.New("mki3dData == nil")
+		return nil, errors.New("mki3dData == nil")
 	}
 
 	var glUni GLUni
-	
-	err:= glUni.SetFromMki3d(mki3dData, width, height )
+
+	err := glUni.SetFromMki3d(mki3dData, width, height)
 
 	if err != nil {
 		return nil, err
@@ -60,7 +57,6 @@ func ProjectionMatrix(p mki3d.ProjectionType, width, height int) mgl32.Mat4 {
 	m.SetRow(2, mgl32.Vec4{0, 0, zz, wz})
 	m.SetRow(3, mgl32.Vec4{0, 0, zw, 0})
 
-	// m=mgl32.Perspective(mgl32.DegToRad(45.0), w/h, p.ZNear, p.ZFar) // test
 	return m
 
 }
@@ -97,10 +93,9 @@ func (glUni *GLUni) SetFromMki3d(mki3dData *mki3d.Mki3dType, width, height int) 
 	}
 	glUni.LightUni = mgl32.Vec3(mki3dData.Light.Vector)
 	glUni.AmbientUni = mki3dData.Light.AmbientFraction
-	glUni.ModelUni = mgl32.Ident4()
+	glUni.ModelUni = mgl32.Ident4() // no corresponding data in Mki3dType
 	glUni.ProjectionUni = ProjectionMatrix(mki3dData.Projection, width, height)
 	glUni.ViewUni = ViewMatrix(mki3dData.View)
 
-	// ...
 	return nil
 }
