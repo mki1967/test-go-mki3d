@@ -3,12 +3,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/mki1967/go-mki3d/mki3d"
 	"github.com/mki1967/test-go-mki3d/tmki3d"
 	"log"
+	"os"
 	"runtime"
 	// "github.com/go-gl/mathgl/mgl32"
 )
@@ -25,8 +27,15 @@ var DataShaderPtr *tmki3d.DataShader // global variable in the main package
 
 func main() {
 
+	// get file name from command line argument
+	if len(os.Args) < 2 {
+		panic(errors.New(" *** PROVIDE FILE NAME AS A COMMAND LINE ARGUMENT !!! *** "))
+	}
+	fmt.Println("Trying to read from ", os.Args[1])
+
 	// Load mki3d data from a file
-	mki3dPtr, err := mki3d.ReadFile("noname.mki3d")
+	// mki3dPtr, err := mki3d.ReadFile("noname.mki3d")
+	mki3dPtr, err := mki3d.ReadFile(os.Args[1])
 	if err != nil {
 		panic(err)
 	}
@@ -84,6 +93,7 @@ func main() {
 
 	// setting callbacks
 	window.SetSizeCallback(SizeCallback)
+	window.SetKeyCallback(KeyCallback)
 
 	previousTime := glfw.GetTime()
 	// main loop
