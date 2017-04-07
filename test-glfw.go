@@ -100,6 +100,12 @@ func main() {
 	}
 	fmt.Printf("%+v\n", *mki3dDataShaderTrPtr) // test
 
+	mki3dDataShaderSegPtr, err := tmki3d.MakeDataShaderSeg(mki3dShaderPtr.Seg, &(mki3dGLBufPtr.Seg), mki3dGLUniPtr, mki3dPtr)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%+v\n", *mki3dDataShaderSegPtr) // test
+
 	SizeCallback := func(w *glfw.Window, width int, height int) {
 		gl.Viewport(0, 0, int32(width), int32(height))
 		fmt.Println(width, height)
@@ -108,7 +114,7 @@ func main() {
 		mki3dGLUniPtr.ProjectionUni = tmki3d.ProjectionMatrix(mki3dPtr.Projection, width, height)
 		fmt.Printf("%+v\n", *mki3dGLUniPtr)
 
-		mki3dDataShaderTrPtr.DrawStage()
+		// mki3dDataShaderTrPtr.DrawStage()
 
 	}
 
@@ -118,7 +124,7 @@ func main() {
 	previousTime := glfw.GetTime()
 	// main loop
 	for !window.ShouldClose() {
-		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT) // to be moved to redraw ?
 
 		// Update
 		time := glfw.GetTime()
@@ -142,6 +148,7 @@ func main() {
 			gl.DrawArrays(gl.TRIANGLES, 0, 6*2*3)
 		*/
 		mki3dDataShaderTrPtr.DrawStage()
+		mki3dDataShaderSegPtr.DrawStage()
 
 		// Maintenance
 		window.SwapBuffers()
