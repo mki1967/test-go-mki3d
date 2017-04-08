@@ -25,6 +25,28 @@ const windowHeight = 600
 
 var DataShaderPtr *tmki3d.DataShader // global variable in the main package
 
+var Window *glfw.Window // main window
+
+func message(msg string) error {
+	fmt.Println(msg)
+	err := Window.Iconify()
+	if err != nil {
+		return err
+	}
+	fmt.Print("(PRESS ENTER TO RESUME:)")
+	fmt.Scanln()
+	err = Window.Restore()
+	if err != nil {
+		panic(err)
+	}
+	// err = Window.Maximize()
+	Window.Show()
+	fmt.Println("RESUMED.")
+	return err
+}
+
+var doInMainThread func() = nil
+
 func main() {
 
 	// get file name from command line argument
@@ -58,6 +80,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	Window = window // copy to global variable
 	window.MakeContextCurrent()
 
 	// Initialize Glow
@@ -95,6 +118,8 @@ func main() {
 	window.SetSizeCallback(SizeCallback)
 	window.SetKeyCallback(KeyCallback)
 
+	message(helpText) // initial help message
+
 	previousTime := glfw.GetTime()
 	// main loop
 	for !window.ShouldClose() {
@@ -111,6 +136,10 @@ func main() {
 		// Maintenance
 		window.SwapBuffers()
 		glfw.WaitEvents()
+		if doInMainThread != nil {
+			doInMainThread()     // execute required function
+			doInMainThread = nil // done
+		}
 		// glfw.PollEvents()
 	}
 }

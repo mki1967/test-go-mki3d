@@ -82,5 +82,13 @@ func KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action,
 	case key == glfw.KeyL && mods == 0:
 		DataShaderPtr.UniPtr.LightUni = DataShaderPtr.UniPtr.ViewUni.Mat3().Inv().Mul3x1(mgl32.Vec3{0, 0, 1}).Normalize()
 
+		/* help */
+	case key == glfw.KeyH && mods == 0:
+		message(helpText)
+		/*
+			doInMainThread = func() {
+				message( helpText )
+			}
+		*/
 	}
 }
