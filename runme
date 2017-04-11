@@ -1,1 +1,1 @@
-go run *.go noname.mki3d
+go run *.go xyz-rgb.mki3d
