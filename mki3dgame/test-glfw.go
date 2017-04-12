@@ -7,17 +7,20 @@ import (
 	"fmt"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
-	"github.com/mki1967/go-mki3d/mki3d"
+	// "github.com/mki1967/go-mki3d/mki3d"
 	"github.com/mki1967/test-go-mki3d/tmki3d"
 	"log"
+	"math/rand"
 	"os"
 	"runtime"
+	"time"
 	// "github.com/go-gl/mathgl/mgl32"
 )
 
 func init() {
 	// GLFW event handling must run on the main OS thread
 	runtime.LockOSThread()
+	rand.Seed(time.Now().Unix()) // init random generator
 }
 
 const windowWidth = 800
@@ -51,16 +54,24 @@ func main() {
 
 	// get file name from command line argument
 	if len(os.Args) < 2 {
-		panic(errors.New(" *** PROVIDE FILE NAME AS A COMMAND LINE ARGUMENT !!! *** "))
+		panic(errors.New(" *** PROVIDE PATH TO ASSETS DIRECTORY AS A COMMAND LINE ARGUMENT !!! *** "))
 	}
 	fmt.Println("Trying to read from ", os.Args[1])
 
 	// Load mki3d data from a file
 	// mki3dPtr, err := mki3d.ReadFile("noname.mki3d")
-	mki3dPtr, err := mki3d.ReadFile(os.Args[1])
+	// mki3dPtr, err := mki3d.ReadFile(os.Args[1])
+
+	assetsPtr, err := LoadAssets(os.Args[1])
 	if err != nil {
 		panic(err)
 	}
+
+	mki3dPtr, err := assetsPtr.LoadRandomStage()
+	if err != nil {
+		panic(err)
+	}
+
 	// fmt.Printf("%v\n", mki3d.Stringify(mki3dPtr)) // for tests ...
 
 	// fragments from https://github.com/go-gl/examples/blob/master/gl41core-cube/cube.go
