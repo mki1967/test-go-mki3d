@@ -39,6 +39,9 @@ type GLBuf struct {
 // LoadTriangleBufs loads data from mki3dData to the GL buffers referenced by glBuf (and fills glBuf.NormalBuf with computed normals)
 func (glBuf *GLBufTr) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
 	glBuf.VertexCount = int32(3 * len(mki3dData.Model.Triangles))
+	if glBuf.VertexCount == 0 {
+		return // do not create empty buffers
+	}
 	dataPos := make([]float32, 0, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
 	dataCol := make([]float32, 0, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
 	dataNor := make([]float32, 0, 9*len(mki3dData.Model.Triangles)) // each triangle has 3*3 coordinates
@@ -77,6 +80,9 @@ func (glBuf *GLBufTr) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
 // LoadSegmentBufs loads data from mki3dData to the GL buffers referenced by glBuf
 func (glBuf *GLBufSeg) LoadSegmentBufs(mki3dData *mki3d.Mki3dType) {
 	glBuf.VertexCount = int32(2 * len(mki3dData.Model.Segments))
+	if glBuf.VertexCount == 0 {
+		return // do not create empty buffers
+	}
 	dataPos := make([]float32, 0, 6*len(mki3dData.Model.Segments)) // each segment has 2*3 coordinates
 	dataCol := make([]float32, 0, 6*len(mki3dData.Model.Segments)) // each segment has 2*3 coordinates
 	i := 0
@@ -117,7 +123,7 @@ func MakeGLBufTr(mki3dData *mki3d.Mki3dType) (glBufPtr *GLBufTr, err error) {
 // MakeGLBufSeg either returns pointer to a new GLBufSeg or an error
 func MakeGLBufSeg(mki3dData *mki3d.Mki3dType) (glBufPtr *GLBufSeg, err error) {
 	var glBuf GLBufSeg
-	var vbo [2]uint32 // 5 is the number of buffers
+	var vbo [2]uint32 // 2 is the number of buffers
 	gl.GenBuffers(2, &vbo[0])
 	// TO DO: test for error ...
 
