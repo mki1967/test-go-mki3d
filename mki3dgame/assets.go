@@ -21,6 +21,7 @@ type Assets struct {
 
 const (
 	StagesDir = "stages"
+	PS        = string(os.PathSeparator)
 )
 
 func LoadAssets(pathToAssets string) (*Assets, error) {
@@ -31,7 +32,9 @@ func LoadAssets(pathToAssets string) (*Assets, error) {
 
 	assets := Assets{Path: pathToAssets, Assets: ass} /// ...
 
-	assets.Stages, err = ioutil.ReadDir(pathToAssets + "/" + StagesDir)
+	assets.Stages, err = ioutil.ReadDir(pathToAssets +
+		PS +
+		StagesDir)
 
 	if err != nil {
 		return &assets, err
@@ -44,7 +47,11 @@ func (a *Assets) LoadRandomStage() (*mki3d.Mki3dType, error) {
 
 	r := rand.Intn(len(a.Stages))
 
-	mki3dPtr, err := mki3d.ReadFile(a.Path + "/" + StagesDir + "/" + a.Stages[r].Name())
+	mki3dPtr, err := mki3d.ReadFile(a.Path +
+		PS +
+		StagesDir +
+		PS +
+		a.Stages[r].Name())
 	if err != nil {
 		return nil, err
 	}
