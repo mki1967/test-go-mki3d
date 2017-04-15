@@ -1,8 +1,8 @@
 package main
 
 import (
+	"fmt" // tests
 	"io/ioutil"
-	// "fmt"
 	// "errors"
 	"github.com/mki1967/go-mki3d/mki3d"
 	"math/rand"
@@ -15,13 +15,16 @@ type Assets struct {
 	Assets   []os.FileInfo
 	Stages   []os.FileInfo
 	Tokens   []os.FileInfo
+	Sectors  []os.FileInfo
 	Monsters []os.FileInfo
 	Icons    []os.FileInfo
 }
 
 const (
-	StagesDir = "stages"
-	PS        = string(os.PathSeparator)
+	StagesDir  = "stages"
+	TokensDir  = "tokens"
+	SectorsDir = "sectors"
+	PS         = string(os.PathSeparator)
 )
 
 func LoadAssets(pathToAssets string) (*Assets, error) {
@@ -40,22 +43,52 @@ func LoadAssets(pathToAssets string) (*Assets, error) {
 		return &assets, err
 	}
 
+	assets.Tokens, err = ioutil.ReadDir(pathToAssets +
+		PS +
+		TokensDir)
+
+	if err != nil {
+		return &assets, err
+	}
+
+	assets.Sectors, err = ioutil.ReadDir(pathToAssets +
+		PS +
+		SectorsDir)
+
+	if err != nil {
+		return &assets, err
+	}
+
+	fmt.Printf("%+v\n", assets) // tests
 	return &assets, nil
 }
 
-func (a *Assets) LoadRandomStage() (*mki3d.Mki3dType, error) {
-
-	r := rand.Intn(len(a.Stages))
-
+func (a *Assets) load(dir string, fInfo os.FileInfo) (*mki3d.Mki3dType, error) {
 	mki3dPtr, err := mki3d.ReadFile(a.Path +
 		PS +
-		StagesDir +
+		dir +
 		PS +
-		a.Stages[r].Name())
+		fInfo.Name())
 	if err != nil {
 		return nil, err
 	}
+	return mki3dPtr, err
+}
 
-	return mki3dPtr, nil
+func (a *Assets) LoadRandomStage() (*mki3d.Mki3dType, error) {
+	r := rand.Intn(len(a.Stages))
+	mki3dPtr, err := a.load(StagesDir, a.Stages[r])
+	return mki3dPtr, err
+}
 
+func (a *Assets) LoadRandomToken() (*mki3d.Mki3dType, error) {
+	r := rand.Intn(len(a.Tokens))
+	mki3dPtr, err := a.load(TokensDir, a.Tokens[r])
+	return mki3dPtr, err
+}
+
+func (a *Assets) LoadRandomSectors() (*mki3d.Mki3dType, error) {
+	r := rand.Intn(len(a.Sectors))
+	mki3dPtr, err := a.load(SectorsDir, a.Sectors[r])
+	return mki3dPtr, err
 }

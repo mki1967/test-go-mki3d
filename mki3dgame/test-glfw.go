@@ -8,13 +8,13 @@ import (
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	// "github.com/mki1967/go-mki3d/mki3d"
+	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/test-go-mki3d/tmki3d"
 	"log"
 	"math/rand"
 	"os"
 	"runtime"
 	"time"
-	// "github.com/go-gl/mathgl/mgl32"
 )
 
 func init() {
@@ -55,21 +55,6 @@ func main() {
 	// get file name from command line argument
 	if len(os.Args) < 2 {
 		panic(errors.New(" *** PROVIDE PATH TO ASSETS DIRECTORY AS A COMMAND LINE ARGUMENT !!! *** "))
-	}
-	fmt.Println("Trying to read from ", os.Args[1])
-
-	// Load mki3d data from a file
-	// mki3dPtr, err := mki3d.ReadFile("noname.mki3d")
-	// mki3dPtr, err := mki3d.ReadFile(os.Args[1])
-
-	assetsPtr, err := LoadAssets(os.Args[1])
-	if err != nil {
-		panic(err)
-	}
-
-	mki3dPtr, err := assetsPtr.LoadRandomStage()
-	if err != nil {
-		panic(err)
 	}
 
 	// fmt.Printf("%v\n", mki3d.Stringify(mki3dPtr)) // for tests ...
@@ -116,6 +101,18 @@ func main() {
 		panic(err)
 	}
 
+	// trying to load assets
+	fmt.Println("Trying to read assets from ", os.Args[1])
+
+	assetsPtr, err := LoadAssets(os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+
+	mki3dPtr, err := assetsPtr.LoadRandomStage()
+	if err != nil {
+		panic(err)
+	}
 	// Get current width and height of the window for MakeDataShader
 	width, height := window.GetSize()
 	mki3dDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, mki3dPtr, width, height)
@@ -123,7 +120,17 @@ func main() {
 		panic(err)
 	}
 
+	mki3dDataShaderPtr.UniPtr.ViewUni = mgl32.Ident4()
+	mki3dDataShaderPtr.UniPtr.ViewUni.SetCol(3, mgl32.Vec3(mki3dDataShaderPtr.Mki3dPtr.Cursor.Position).Mul(-1).Vec4(1))
 	DataShaderPtr = mki3dDataShaderPtr // set the global variable
+
+	tokenPtr, err := assetsPtr.LoadRandomToken()
+	tokenDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, tokenPtr, width, height)
+
+	sectorsPtr, err := assetsPtr.LoadRandomSectors()
+	sectorsDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, sectorsPtr, width, height)
+
+	sectorsDataShaderPtr.UniPtr.SetSimple()
 
 	// setting callbacks
 	window.SetSizeCallback(SizeCallback)
@@ -142,7 +149,16 @@ func main() {
 		_ = elapsed // do not forget!
 
 		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT) // to be moved to redraw ?
+		// draw stage
+		mki3dDataShaderPtr.SetBackgroundColor()
 		mki3dDataShaderPtr.DrawStage()
+		// draw tokens
+		tokenDataShaderPtr.DrawModel()
+
+		// draw sectors
+		gl.Disable(gl.DEPTH_TEST)
+		sectorsDataShaderPtr.DrawStage()
+		gl.Enable(gl.DEPTH_TEST)
 
 		// Maintenance
 		window.SwapBuffers()

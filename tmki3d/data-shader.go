@@ -251,10 +251,6 @@ func (ds *DataShaderTr) InitStage() (err error) {
 		return err
 	}
 
-	// to be moved elsewhere ...
-	bg := ds.Mki3dPtr.BackgroundColor
-	gl.ClearColor(bg[0], bg[1], bg[2], 1.0)
-
 	return nil
 
 }
@@ -275,12 +271,7 @@ func (ds *DataShaderSeg) InitStage() (err error) {
 		return err
 	}
 
-	// to be moved elsewhere ...
-	bg := ds.Mki3dPtr.BackgroundColor
-	gl.ClearColor(bg[0], bg[1], bg[2], 1.0)
-
 	return nil
-
 }
 
 // InitStage initiates stage parameters assuming that ds is a stage
@@ -302,11 +293,14 @@ func (ds *DataShader) InitStage() (err error) {
 		return err
 	}
 
-	bg := ds.Mki3dPtr.BackgroundColor
-	gl.ClearColor(bg[0], bg[1], bg[2], 1.0)
 
 	return nil
 
+}
+
+func (ds *DataShader) SetBackgroundColor() {
+	bg := ds.Mki3dPtr.BackgroundColor
+	gl.ClearColor(bg[0], bg[1], bg[2], 1.0)
 }
 
 // Draw a model (triangles)
