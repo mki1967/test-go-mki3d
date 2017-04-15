@@ -63,12 +63,12 @@ func LoadAssets(pathToAssets string) (*Assets, error) {
 	return &assets, nil
 }
 
-func (a *Assets) load(dir string, fInfo os.FileInfo) (*mki3d.Mki3dType, error) {
+func (a *Assets) load(dir string, fname string) (*mki3d.Mki3dType, error) {
 	mki3dPtr, err := mki3d.ReadFile(a.Path +
 		PS +
 		dir +
 		PS +
-		fInfo.Name())
+		fname)
 	if err != nil {
 		return nil, err
 	}
@@ -77,18 +77,18 @@ func (a *Assets) load(dir string, fInfo os.FileInfo) (*mki3d.Mki3dType, error) {
 
 func (a *Assets) LoadRandomStage() (*mki3d.Mki3dType, error) {
 	r := rand.Intn(len(a.Stages))
-	mki3dPtr, err := a.load(StagesDir, a.Stages[r])
+	mki3dPtr, err := a.load(StagesDir, a.Stages[r].Name())
 	return mki3dPtr, err
 }
 
 func (a *Assets) LoadRandomToken() (*mki3d.Mki3dType, error) {
 	r := rand.Intn(len(a.Tokens))
-	mki3dPtr, err := a.load(TokensDir, a.Tokens[r])
+	mki3dPtr, err := a.load(TokensDir, a.Tokens[r].Name())
 	return mki3dPtr, err
 }
 
 func (a *Assets) LoadRandomSectors() (*mki3d.Mki3dType, error) {
 	r := rand.Intn(len(a.Sectors))
-	mki3dPtr, err := a.load(SectorsDir, a.Sectors[r])
+	mki3dPtr, err := a.load(SectorsDir, a.Sectors[r].Name())
 	return mki3dPtr, err
 }
