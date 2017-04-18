@@ -27,12 +27,19 @@ type DataShaderSeg struct {
 }
 
 // DataShader contains SegPtr (a pointer to binding between data and a shader for segments) and
-// Tr (a pointer to  binding between data and a shader for triangles)
+// TrPtr (a pointer to  binding between data and a shader for triangles)
 type DataShader struct {
 	Mki3dPtr *mki3d.Mki3dType // redundant link to mki3d data
 	UniPtr   *GLUni           // redundant link to uniforms
 	SegPtr   *DataShaderSeg
 	TrPtr    *DataShaderTr
+}
+
+// Deletes data bound to the dsPtr when no longer needed
+func (dsPtr *DataShader) DeleteData() {
+	dsPtr.SegPtr.BufPtr.Delete()
+	dsPtr.TrPtr.BufPtr.Delete()
+	dsPtr = nil
 }
 
 // MakeDataShader creates DataShader with all required substructures for given ShaderSeg and mki3d.Mki3dType.
@@ -292,7 +299,6 @@ func (ds *DataShader) InitStage() (err error) {
 	if err != nil {
 		return err
 	}
-
 
 	return nil
 

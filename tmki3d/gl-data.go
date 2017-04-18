@@ -36,6 +36,24 @@ type GLBuf struct {
 	SegPtr *GLBufSeg
 }
 
+// Delete the buffers in GL, when they are not needed any more
+func (glBuf *GLBufTr) Delete() {
+	vbo := []uint32{glBuf.PositionBuf, glBuf.NormalBuf, glBuf.ColorBuf}
+	gl.DeleteBuffers(3, &vbo[0])
+}
+
+// Delete the buffers in GL, when they are not needed any more
+func (glBuf *GLBufSeg) Delete() {
+	vbo := []uint32{glBuf.PositionBuf, glBuf.ColorBuf}
+	gl.DeleteBuffers(3, &vbo[0])
+}
+
+// Delete the buffers in GL, when they are not needed any more
+func (glBuf *GLBuf) Delete() {
+	glBuf.TrPtr.Delete()
+	glBuf.SegPtr.Delete()
+}
+
 // LoadTriangleBufs loads data from mki3dData to the GL buffers referenced by glBuf (and fills glBuf.NormalBuf with computed normals)
 func (glBuf *GLBufTr) LoadTriangleBufs(mki3dData *mki3d.Mki3dType) {
 	glBuf.VertexCount = int32(3 * len(mki3dData.Model.Triangles))

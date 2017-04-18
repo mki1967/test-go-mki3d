@@ -169,4 +169,9 @@ func main() {
 		}
 		// glfw.PollEvents()
 	}
+
+	// cleanup
+	mki3dDataShaderPtr.DeleteData()
+	sectorsDataShaderPtr.DeleteData()
+	tokenDataShaderPtr.DeleteData()
 }

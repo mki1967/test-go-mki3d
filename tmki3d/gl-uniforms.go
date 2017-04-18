@@ -17,15 +17,14 @@ type GLUni struct {
 
 // SetSimple  sets GLUni for simple drawing directly in clipping space
 // (i.e. rectangular projection on XY plane in the cube [-1,1]^3 resized to the window)
-func  (glUni *GLUni) SetSimple () {
+func (glUni *GLUni) SetSimple() {
 	glUni.ProjectionUni = mgl32.Ident4()
 	glUni.ViewUni = mgl32.Ident4()
 	glUni.ModelUni = mgl32.Ident4()
-	glUni.LightUni = mgl32.Vec3{ 0 , 0, 1}
+	glUni.LightUni = mgl32.Vec3{0, 0, 1}
 	glUni.AmbientUni = 1
-	
-}
 
+}
 
 // MakeGLUni makes GLUni with values of uniforms computed from mki3dData and returns a pointer to it.
 func MakeGLUni(mki3dData *mki3d.Mki3dType, width, height int) (*GLUni, error) {
