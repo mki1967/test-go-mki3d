@@ -1,7 +1,7 @@
 package tmki3d
 
 import (
-	"errors"
+	// "errors"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/go-mki3d/mki3d"
 )
@@ -26,21 +26,13 @@ func (glUni *GLUni) SetSimple() {
 
 }
 
-// MakeGLUni makes GLUni with values of uniforms computed from mki3dData and returns a pointer to it.
-func MakeGLUni(mki3dData *mki3d.Mki3dType, width, height int) (*GLUni, error) {
-	if mki3dData == nil {
-		return nil, errors.New("mki3dData == nil")
-	}
-
+// MakeGLUni makes GLUni with values of uniforms set to simple default values  and returns a pointer to it.
+func MakeGLUni() *GLUni {
 	var glUni GLUni
 
-	err := glUni.SetFromMki3d(mki3dData, width, height)
+	glUni.SetSimple()
 
-	if err != nil {
-		return nil, err
-	}
-
-	return &glUni, nil
+	return &glUni
 }
 
 // ProjectionMatrix computes GL projection matrix from mki3d.ProjectionType, using width and height of current window
@@ -97,16 +89,21 @@ func ViewMatrix(v mki3d.ViewType) mgl32.Mat4 {
 
 }
 
-// SetFromMki3d sets the fields of glUni based on the data from mki3dData and on the width and height (of the display window)
-func (glUni *GLUni) SetFromMki3d(mki3dData *mki3d.Mki3dType, width, height int) (err error) {
-	if glUni == nil {
-		return errors.New("glUni == nil")
-	}
+// Sets uniform projection matrix of glUni based on the data from mki3dData and on the width and height (of the display window).
+// The function panics if mki3dData == nil
+func (glUni *GLUni) SetProjectionFromMki3d(mki3dData *mki3d.Mki3dType, width, height int) {
+	glUni.ProjectionUni = ProjectionMatrix(mki3dData.Projection, width, height)
+}
+
+// Sets the view matrix of glUni based on the data from mki3dData.
+// The function panics if mki3dData == nil
+func (glUni *GLUni) SetViewFromMki3d(mki3dData *mki3d.Mki3dType) {
+	glUni.ViewUni = ViewMatrix(mki3dData.View)
+}
+
+// Sets the light parameters of glUni based on the data from mki3dData
+// The function panics if mki3dData == nil
+func (glUni *GLUni) SetLightFromMki3d(mki3dData *mki3d.Mki3dType) {
 	glUni.LightUni = mgl32.Vec3(mki3dData.Light.Vector)
 	glUni.AmbientUni = mki3dData.Light.AmbientFraction
-	glUni.ModelUni = mgl32.Ident4() // no corresponding data in Mki3dType
-	glUni.ProjectionUni = ProjectionMatrix(mki3dData.Projection, width, height)
-	glUni.ViewUni = ViewMatrix(mki3dData.View)
-
-	return nil
 }

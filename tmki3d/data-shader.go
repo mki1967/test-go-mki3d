@@ -44,8 +44,8 @@ func (dsPtr *DataShader) DeleteData() {
 
 // MakeDataShader creates DataShader with all required substructures for given ShaderSeg and mki3d.Mki3dType.
 // Parameters witdh and height (of the display window) are used for computing projection matrix.
-func MakeDataShader(sPtr *Shader, mPtr *mki3d.Mki3dType, width, height int) (dsPtr *DataShader, err error) {
-	uPtr, err := MakeGLUni(mPtr, width, height) // uniforms
+func MakeDataShader(sPtr *Shader, mPtr *mki3d.Mki3dType) (dsPtr *DataShader, err error) {
+	uPtr := MakeGLUni() // uniforms
 	if err != nil {
 		return nil, err
 	}

@@ -115,20 +115,22 @@ func main() {
 	}
 	// Get current width and height of the window for MakeDataShader
 	width, height := window.GetSize()
-	mki3dDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, mki3dPtr, width, height)
+	mki3dDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, mki3dPtr)
 	if err != nil {
 		panic(err)
 	}
+	mki3dDataShaderPtr.UniPtr.SetProjectionFromMki3d(mki3dPtr, width, height)
+	mki3dDataShaderPtr.UniPtr.SetLightFromMki3d(mki3dPtr)
 
 	mki3dDataShaderPtr.UniPtr.ViewUni = mgl32.Ident4()
 	mki3dDataShaderPtr.UniPtr.ViewUni.SetCol(3, mgl32.Vec3(mki3dDataShaderPtr.Mki3dPtr.Cursor.Position).Mul(-1).Vec4(1))
 	DataShaderPtr = mki3dDataShaderPtr // set the global variable
 
 	tokenPtr, err := assetsPtr.LoadRandomToken()
-	tokenDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, tokenPtr, width, height)
+	tokenDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, tokenPtr)
 
 	sectorsPtr, err := assetsPtr.LoadRandomSectors()
-	sectorsDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, sectorsPtr, width, height)
+	sectorsDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, sectorsPtr)
 
 	sectorsDataShaderPtr.UniPtr.SetSimple()
 
