@@ -8,7 +8,7 @@ import (
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	// "github.com/mki1967/go-mki3d/mki3d"
-	"github.com/go-gl/mathgl/mgl32"
+	// "github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/test-go-mki3d/tmki3d"
 	"log"
 	"math/rand"
@@ -109,22 +109,30 @@ func main() {
 		panic(err)
 	}
 
-	mki3dPtr, err := assetsPtr.LoadRandomStage()
-	if err != nil {
-		panic(err)
-	}
 	// Get current width and height of the window for MakeDataShader
 	width, height := window.GetSize()
-	mki3dDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, mki3dPtr)
+
+	game, err := MakeEmptyGame(os.Args[1])
 	if err != nil {
 		panic(err)
 	}
-	mki3dDataShaderPtr.UniPtr.SetProjectionFromMki3d(mki3dPtr, width, height)
-	mki3dDataShaderPtr.UniPtr.SetLightFromMki3d(mki3dPtr)
+	err = game.InitSectors()
+	if err != nil {
+		panic(err)
+	}
 
-	mki3dDataShaderPtr.UniPtr.ViewUni = mgl32.Ident4()
-	mki3dDataShaderPtr.UniPtr.ViewUni.SetCol(3, mgl32.Vec3(mki3dDataShaderPtr.Mki3dPtr.Cursor.Position).Mul(-1).Vec4(1))
-	DataShaderPtr = mki3dDataShaderPtr // set the global variable
+	err = game.InitStage(width, height)
+	if err != nil {
+		panic(err)
+	}
+
+	err = game.InitToken()
+	if err != nil {
+		panic(err)
+	}
+
+	// DataShaderPtr = mki3dDataShaderPtr // set the global variable
+	DataShaderPtr = game.StageDSPtr // set the global variable
 
 	tokenPtr, err := assetsPtr.LoadRandomToken()
 	tokenDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, tokenPtr)
@@ -150,17 +158,7 @@ func main() {
 		previousTime = time
 		_ = elapsed // do not forget!
 
-		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT) // to be moved to redraw ?
-		// draw stage
-		mki3dDataShaderPtr.SetBackgroundColor()
-		mki3dDataShaderPtr.DrawStage()
-		// draw tokens
-		tokenDataShaderPtr.DrawModel()
-
-		// draw sectors
-		gl.Disable(gl.DEPTH_TEST)
-		sectorsDataShaderPtr.DrawStage()
-		gl.Enable(gl.DEPTH_TEST)
+		game.Redraw()
 
 		// Maintenance
 		window.SwapBuffers()
@@ -173,7 +171,7 @@ func main() {
 	}
 
 	// cleanup
-	mki3dDataShaderPtr.DeleteData()
+	game.StageDSPtr.DeleteData()
 	sectorsDataShaderPtr.DeleteData()
 	tokenDataShaderPtr.DeleteData()
 }

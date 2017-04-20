@@ -4,8 +4,10 @@ import (
 	// "fmt" // tests
 	// "errors"
 	// "github.com/mki1967/go-mki3d/mki3d"
+	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/test-go-mki3d/tmki3d"
+	// "github.com/go-gl/glfw/v3.2/glfw"
 	// "math/rand"
 )
 
@@ -68,6 +70,65 @@ func (game *Mki3dGame) InitSectors() error {
 	game.SectorsDSPtr = sectorsDataShaderPtr
 
 	return nil
+}
+
+// Load token shape and init the tokenDSPtr.
+func (game *Mki3dGame) InitToken() error {
+	tokenPtr, err := game.AssetsPtr.LoadRandomToken()
+	if err != nil {
+		return err
+	}
+
+	tokenDataShaderPtr, err := tmki3d.MakeDataShader(game.ShaderPtr, tokenPtr)
+	if err != nil {
+		return err
+	}
+
+	tokenDataShaderPtr.UniPtr.SetSimple()
+
+	game.TokenDSPtr = tokenDataShaderPtr
+
+	return nil
+}
+
+// Load sectors shape and init the related data.
+func (game *Mki3dGame) InitStage(width, height int) error {
+	stagePtr, err := game.AssetsPtr.LoadRandomStage()
+	if err != nil {
+		return err
+	}
+
+	stageDataShaderPtr, err := tmki3d.MakeDataShader(game.ShaderPtr, stagePtr)
+	if err != nil {
+		return err
+	}
+
+	stageDataShaderPtr.UniPtr.SetSimple()
+	stageDataShaderPtr.UniPtr.SetProjectionFromMki3d(stagePtr, width, height)
+	stageDataShaderPtr.UniPtr.SetLightFromMki3d(stagePtr)
+
+	stageDataShaderPtr.UniPtr.ViewUni = mgl32.Ident4()
+	stageDataShaderPtr.UniPtr.ViewUni.SetCol(3, mgl32.Vec3(stageDataShaderPtr.Mki3dPtr.Cursor.Position).Mul(-1).Vec4(1))
+
+	game.StageDSPtr = stageDataShaderPtr
+
+	return nil
+}
+
+// Redraw the game stage
+func (game *Mki3dGame) Redraw() {
+	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT) // to be moved to redraw ?
+	// draw stage
+	game.StageDSPtr.SetBackgroundColor()
+	game.StageDSPtr.DrawStage()
+	// draw tokens
+	game.TokenDSPtr.DrawModel()
+
+	// draw sectors
+	gl.Disable(gl.DEPTH_TEST)
+	game.SectorsDSPtr.DrawStage()
+	gl.Enable(gl.DEPTH_TEST)
+
 }
 
 type Traveler struct {
