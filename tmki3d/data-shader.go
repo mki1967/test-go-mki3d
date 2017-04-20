@@ -35,11 +35,10 @@ type DataShader struct {
 	TrPtr    *DataShaderTr
 }
 
-// Deletes data bound to the dsPtr when no longer needed
+// Deletes GL data bound to the dsPtr when no longer needed
 func (dsPtr *DataShader) DeleteData() {
 	dsPtr.SegPtr.BufPtr.Delete()
 	dsPtr.TrPtr.BufPtr.Delete()
-	dsPtr = nil
 }
 
 // MakeDataShader creates DataShader with all required substructures for given ShaderSeg and mki3d.Mki3dType.

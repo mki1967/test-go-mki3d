@@ -131,6 +131,11 @@ func main() {
 		panic(err)
 	}
 
+	err = game.InitMonster()
+	if err != nil {
+		panic(err)
+	}
+
 	// DataShaderPtr = mki3dDataShaderPtr // set the global variable
 	DataShaderPtr = game.StageDSPtr // set the global variable
 

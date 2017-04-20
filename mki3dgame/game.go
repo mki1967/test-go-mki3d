@@ -55,6 +55,7 @@ func MakeEmptyGame(pathToAssets string) (*Mki3dGame, error) {
 
 // Load sectors shape and init the SectorsDSPtr.
 func (game *Mki3dGame) InitSectors() error {
+
 	sectorsPtr, err := game.AssetsPtr.LoadRandomSectors()
 	if err != nil {
 		return err
@@ -67,6 +68,10 @@ func (game *Mki3dGame) InitSectors() error {
 
 	sectorsDataShaderPtr.UniPtr.SetSimple()
 
+	if game.SectorsDSPtr != nil {
+		game.SectorsDSPtr.DeleteData() // free old GL buffers
+	}
+
 	game.SectorsDSPtr = sectorsDataShaderPtr
 
 	return nil
@@ -74,6 +79,7 @@ func (game *Mki3dGame) InitSectors() error {
 
 // Load token shape and init the tokenDSPtr.
 func (game *Mki3dGame) InitToken() error {
+
 	tokenPtr, err := game.AssetsPtr.LoadRandomToken()
 	if err != nil {
 		return err
@@ -86,13 +92,42 @@ func (game *Mki3dGame) InitToken() error {
 
 	tokenDataShaderPtr.UniPtr.SetSimple()
 
+	if game.TokenDSPtr != nil {
+		game.TokenDSPtr.DeleteData() // free old GL buffers
+	}
+
 	game.TokenDSPtr = tokenDataShaderPtr
 
 	return nil
 }
 
-// Load sectors shape and init the related data.
+// Load token shape and init the tokenDSPtr.
+func (game *Mki3dGame) InitMonster() error {
+
+	monsterPtr, err := game.AssetsPtr.LoadRandomMonster()
+	if err != nil {
+		return err
+	}
+
+	monsterDataShaderPtr, err := tmki3d.MakeDataShader(game.ShaderPtr, monsterPtr)
+	if err != nil {
+		return err
+	}
+
+	monsterDataShaderPtr.UniPtr.SetSimple()
+
+	if game.MonsterDSPtr != nil {
+		game.MonsterDSPtr.DeleteData() // free old GL buffers
+	}
+
+	game.MonsterDSPtr = monsterDataShaderPtr
+
+	return nil
+}
+
+// Load stage shape and init the related data.
 func (game *Mki3dGame) InitStage(width, height int) error {
+
 	stagePtr, err := game.AssetsPtr.LoadRandomStage()
 	if err != nil {
 		return err
@@ -110,7 +145,46 @@ func (game *Mki3dGame) InitStage(width, height int) error {
 	stageDataShaderPtr.UniPtr.ViewUni = mgl32.Ident4()
 	stageDataShaderPtr.UniPtr.ViewUni.SetCol(3, mgl32.Vec3(stageDataShaderPtr.Mki3dPtr.Cursor.Position).Mul(-1).Vec4(1))
 
+	if game.StageDSPtr != nil {
+		game.StageDSPtr.DeleteData() // free old GL buffers
+	}
+
 	game.StageDSPtr = stageDataShaderPtr
+
+	// compute bounding box of the stage: VMin, VMax
+
+	game.VMax = mgl32.Vec3(stagePtr.Cursor.Position) // cursror position should be included - the starting poin of traveler
+	game.VMin = game.VMax
+
+	for _, seg := range stagePtr.Model.Segments {
+		for _, point := range seg {
+			for d := range point.Position {
+				if game.VMax[d] < point.Position[d] {
+					game.VMax[d] = point.Position[d]
+				}
+				if game.VMin[d] > point.Position[d] {
+					game.VMin[d] = point.Position[d]
+				}
+			}
+
+		}
+	}
+
+	for _, tr := range stagePtr.Model.Triangles {
+		for _, point := range tr {
+			for d := range point.Position {
+				if game.VMax[d] < point.Position[d] {
+					game.VMax[d] = point.Position[d]
+				}
+				if game.VMin[d] > point.Position[d] {
+					game.VMin[d] = point.Position[d]
+				}
+			}
+
+		}
+	}
+
+	// fmt.Println(game.VMin, game.VMax) // test
 
 	return nil
 }
@@ -123,6 +197,8 @@ func (game *Mki3dGame) Redraw() {
 	game.StageDSPtr.DrawStage()
 	// draw tokens
 	game.TokenDSPtr.DrawModel()
+	// draw monsters
+	game.MonsterDSPtr.DrawModel()
 
 	// draw sectors
 	gl.Disable(gl.DEPTH_TEST)

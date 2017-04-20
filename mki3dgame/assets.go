@@ -21,10 +21,11 @@ type Assets struct {
 }
 
 const (
-	StagesDir  = "stages"
-	TokensDir  = "tokens"
-	SectorsDir = "sectors"
-	PS         = string(os.PathSeparator)
+	StagesDir   = "stages"
+	TokensDir   = "tokens"
+	SectorsDir  = "sectors"
+	MonstersDir = "monsters"
+	PS          = string(os.PathSeparator)
 )
 
 func LoadAssets(pathToAssets string) (*Assets, error) {
@@ -46,6 +47,14 @@ func LoadAssets(pathToAssets string) (*Assets, error) {
 	assets.Tokens, err = ioutil.ReadDir(pathToAssets +
 		PS +
 		TokensDir)
+
+	if err != nil {
+		return &assets, err
+	}
+
+	assets.Monsters, err = ioutil.ReadDir(pathToAssets +
+		PS +
+		MonstersDir)
 
 	if err != nil {
 		return &assets, err
@@ -84,6 +93,12 @@ func (a *Assets) LoadRandomStage() (*mki3d.Mki3dType, error) {
 func (a *Assets) LoadRandomToken() (*mki3d.Mki3dType, error) {
 	r := rand.Intn(len(a.Tokens))
 	mki3dPtr, err := a.load(TokensDir, a.Tokens[r].Name())
+	return mki3dPtr, err
+}
+
+func (a *Assets) LoadRandomMonster() (*mki3d.Mki3dType, error) {
+	r := rand.Intn(len(a.Monsters))
+	mki3dPtr, err := a.load(MonstersDir, a.Monsters[r].Name())
 	return mki3dPtr, err
 }
 
