@@ -1,17 +1,19 @@
 package main
 
 import (
-	// "fmt" // tests
+	"fmt" // tests
 	// "errors"
-	// "github.com/mki1967/go-mki3d/mki3d"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
+	"github.com/mki1967/go-mki3d/mki3d"
 	"github.com/mki1967/test-go-mki3d/tmki3d"
 	// "github.com/go-gl/glfw/v3.2/glfw"
 	// "math/rand"
 )
 
-const MARGIN = 40 // margin for bounding box of the stage
+const BoxMargin = 40 // margin for bounding box of the stage
+
+var FrameColor = mki3d.Vector3dType{1.0, 1.0, 1.0} // color of the bounding box frame
 
 // data structure for the game
 type Mki3dGame struct {
@@ -26,7 +28,7 @@ type Mki3dGame struct {
 	TokenDSPtr   *tmki3d.DataShader
 	MonsterDSPtr *tmki3d.DataShader
 
-	VMin, VMax mgl32.Vec3 // corners of the bounding box of the stage (computed with the MARGIN)
+	VMin, VMax mgl32.Vec3 // corners of the bounding box of the stage (computed with the BoxMargin)
 
 	TravelerPtr *Traveler // the first person (the player)
 
@@ -151,8 +153,15 @@ func (game *Mki3dGame) InitStage(width, height int) error {
 
 	game.StageDSPtr = stageDataShaderPtr
 
-	// compute bounding box of the stage: VMin, VMax
+	game.copmuteVMinVMax() // compute bounding box of the stage: VMin, VMax
+	game.copmuteFrame()    // visible line frame of the bounding box
 
+	return nil
+}
+
+// recompute bounding box  with the BoxMargin  corners of the stage.
+func (game *Mki3dGame) copmuteVMinVMax() {
+	stagePtr := game.StageDSPtr.Mki3dPtr
 	game.VMax = mgl32.Vec3(stagePtr.Cursor.Position) // cursror position should be included - the starting poin of traveler
 	game.VMin = game.VMax
 
@@ -184,9 +193,69 @@ func (game *Mki3dGame) InitStage(width, height int) error {
 		}
 	}
 
-	// fmt.Println(game.VMin, game.VMax) // test
+	m := mgl32.Vec3{BoxMargin, BoxMargin, BoxMargin}
 
-	return nil
+	game.VMin = game.VMin.Sub(m)
+	game.VMax = game.VMax.Add(m)
+	fmt.Println(game.VMin, game.VMax) // test
+}
+
+// recompute frame of the bounding box corners of the stage.
+func (game *Mki3dGame) copmuteFrame() {
+	a := game.VMin
+	b := game.VMax
+
+	v000 := mki3d.Vector3dType(a)
+	v001 := mki3d.Vector3dType{a[0], a[1], b[2]}
+	v010 := mki3d.Vector3dType{a[0], b[1], a[2]}
+	v011 := mki3d.Vector3dType{a[0], b[1], b[2]}
+	v100 := mki3d.Vector3dType{b[0], a[1], a[2]}
+	v101 := mki3d.Vector3dType{b[0], a[1], b[2]}
+	v110 := mki3d.Vector3dType{b[0], b[1], a[2]}
+	v111 := mki3d.Vector3dType(b)
+
+	lines := [][2]mki3d.Vector3dType{
+		{v000, v001},
+		{v010, v011},
+		{v100, v101},
+		{v110, v111},
+
+		{v000, v010},
+		{v001, v011},
+		{v100, v110},
+		{v101, v111},
+
+		{v000, v100},
+		{v001, v101},
+		{v010, v110},
+		{v011, v111}}
+
+	segments := mki3d.SegmentsType(make([]mki3d.SegmentType, 12))
+
+	for i := range segments {
+		segments[i] = mki3d.SegmentType{
+			{Position: lines[i][0], Color: FrameColor},
+			{Position: lines[i][1], Color: FrameColor}}
+	}
+
+	var frameMki3d mki3d.Mki3dType
+
+	frameMki3d.Model.Segments = segments
+
+	dsPtr, err := tmki3d.MakeDataShader(game.ShaderPtr, &frameMki3d)
+
+	if err != nil {
+		panic(err)
+	}
+
+	dsPtr.UniPtr.SetSimple()
+
+	if game.FrameDSPtr != nil {
+		game.FrameDSPtr.DeleteData() // free old GL buffers
+	}
+
+	game.FrameDSPtr = dsPtr
+
 }
 
 // Redraw the game stage
@@ -195,6 +264,8 @@ func (game *Mki3dGame) Redraw() {
 	// draw stage
 	game.StageDSPtr.SetBackgroundColor()
 	game.StageDSPtr.DrawStage()
+	// draw frame
+	game.FrameDSPtr.DrawModel()
 	// draw tokens
 	game.TokenDSPtr.DrawModel()
 	// draw monsters
