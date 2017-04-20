@@ -9,6 +9,7 @@ import (
 	"github.com/mki1967/test-go-mki3d/tmki3d"
 	// "github.com/go-gl/glfw/v3.2/glfw"
 	// "math/rand"
+	"math"
 )
 
 const BoxMargin = 40 // margin for bounding box of the stage
@@ -156,6 +157,8 @@ func (game *Mki3dGame) InitStage(width, height int) error {
 	game.copmuteVMinVMax() // compute bounding box of the stage: VMin, VMax
 	game.copmuteFrame()    // visible line frame of the bounding box
 
+	game.TravelerPtr = MakeTraveler(mgl32.Vec3(stagePtr.Cursor.Position))
+
 	return nil
 }
 
@@ -281,7 +284,67 @@ func (game *Mki3dGame) Redraw() {
 type Traveler struct {
 	Position mgl32.Vec3 // position
 	/* orientation */
-	rotXZ float32 // horizontal rotation (in degrees)
-	rotYZ float32 // vertical rotation (in degrees)
+	RotXZ float64 // horizontal rotation (in degrees)
+	RotYZ float64 // vertical rotation (in degrees)
 
+}
+
+const degToRadians = math.Pi / 180
+
+func (t *Traveler) WorldRotatedVector(vector mgl32.Vec3) mgl32.Vec3 {
+	c1 := float32(math.Cos(t.RotXZ * degToRadians))
+	s1 := float32(math.Sin(t.RotXZ * degToRadians))
+	c2 := float32(math.Cos(t.RotYZ * degToRadians))
+	s2 := float32(math.Sin(t.RotYZ * degToRadians))
+
+	return mgl32.Vec3{
+		c1*vector[0] - s1*s2*vector[1] - s1*c2*vector[2],
+		c2*vector[1] - s2*vector[2],
+		s1*vector[0] + c1*s2*vector[1] + c1*c2*vector[2],
+	}
+}
+
+func (t *Traveler) ViewerRotatedVector(vector mgl32.Vec3) mgl32.Vec3 {
+	c1 := float32(math.Cos(-t.RotXZ * degToRadians))
+	s1 := float32(math.Sin(-t.RotXZ * degToRadians))
+	c2 := float32(math.Cos(-t.RotYZ * degToRadians))
+	s2 := float32(math.Sin(-t.RotYZ * degToRadians))
+
+	return mgl32.Vec3{
+		c1*vector[0] - s1*vector[2],
+		-s2*s1*vector[0] + c2*vector[1] - s2*c1*vector[2],
+		c2*s1*vector[0] + s2*vector[1] + c2*c1*vector[2],
+	}
+}
+
+func (t *Traveler) ViewMatrix() mgl32.Mat4 {
+	c1 := float32(math.Cos(-t.RotXZ * degToRadians))
+	s1 := float32(math.Sin(-t.RotXZ * degToRadians))
+
+	c2 := float32(math.Cos(-t.RotYZ * degToRadians))
+	s2 := float32(math.Sin(-t.RotYZ * degToRadians))
+
+	v := t.ViewerRotatedVector(t.Position.Mul(-1))
+
+	// row-major ??
+	return mgl32.Mat4{
+		c1, 0, -s1, v[0],
+		-s2 * s1, c2, -s2 * c1, v[1],
+		c2 * s1, s2, c2 * c1, v[2],
+		0, 0, 0, 1,
+	}.Transpose()
+}
+
+func (t *Traveler) Move(dx, dy, dz float32) {
+	v := t.WorldRotatedVector(mgl32.Vec3{dx, dy, dz})
+	t.Position = t.Position.Add(v)
+
+	// check bounds and other conditions ...
+
+}
+
+func MakeTraveler(position mgl32.Vec3) *Traveler {
+	var t Traveler
+	t.Position = position
+	return &t
 }

@@ -27,6 +27,7 @@ const windowWidth = 800
 const windowHeight = 600
 
 var DataShaderPtr *tmki3d.DataShader // global variable in the main package
+var GamePtr *Mki3dGame               // global variable in the main package
 
 var Window *glfw.Window // main window
 
@@ -136,6 +137,7 @@ func main() {
 		panic(err)
 	}
 
+	GamePtr = game
 	// DataShaderPtr = mki3dDataShaderPtr // set the global variable
 	DataShaderPtr = game.StageDSPtr // set the global variable
 

@@ -27,56 +27,82 @@ func KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action,
 	switch {
 
 	/* rotate model */
-	case key == glfw.KeyRight && mods == glfw.ModControl:
-		DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DY(angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
-	case key == glfw.KeyLeft && mods == glfw.ModControl:
-		DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DY(-angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
-	case key == glfw.KeyUp && mods == glfw.ModControl:
-		DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DX(-angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
-	case key == glfw.KeyDown && mods == glfw.ModControl:
-		DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DX(angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
+	/*
+		case key == glfw.KeyRight && mods == glfw.ModControl:
+			DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DY(angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
+		case key == glfw.KeyLeft && mods == glfw.ModControl:
+			DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DY(-angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
+		case key == glfw.KeyUp && mods == glfw.ModControl:
+			DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DX(-angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
+		case key == glfw.KeyDown && mods == glfw.ModControl:
+			DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DX(angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
+	*/
 
 	/* rotate view */
 	case key == glfw.KeyRight && mods == 0:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DY(-angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
+		GamePtr.TravelerPtr.RotXZ -= 1 // degree
+		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
+		// DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DY(-angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeyLeft && mods == 0:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DY(angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
+		GamePtr.TravelerPtr.RotXZ += 1 // degree
+		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
+		// DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DY(angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeyUp && mods == 0:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DX(angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
+		GamePtr.TravelerPtr.RotYZ -= 1 // degree
+		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
+		// DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DX(angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeyDown && mods == 0:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DX(-angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
+		GamePtr.TravelerPtr.RotYZ += 1 // degree
+		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
+		// DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DX(-angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
+	case key == glfw.KeySpace:
+		GamePtr.TravelerPtr.RotYZ = 0 // degree
+		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
 
 		/* move model*/
-	case key == glfw.KeyRight && mods == glfw.ModControl|glfw.ModShift:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeyLeft && mods == glfw.ModControl|glfw.ModShift:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(-step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeyUp && mods == glfw.ModControl|glfw.ModShift:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeyDown && mods == glfw.ModControl|glfw.ModShift:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, -step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeyF && mods == glfw.ModControl|glfw.ModShift:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, step).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeyB && mods == glfw.ModControl|glfw.ModShift:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, -step).Mul4(DataShaderPtr.UniPtr.ViewUni)
-
+		/*
+			case key == glfw.KeyRight && mods == glfw.ModControl|glfw.ModShift:
+				DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
+			case key == glfw.KeyLeft && mods == glfw.ModControl|glfw.ModShift:
+				DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(-step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
+			case key == glfw.KeyUp && mods == glfw.ModControl|glfw.ModShift:
+				DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
+			case key == glfw.KeyDown && mods == glfw.ModControl|glfw.ModShift:
+				DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, -step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
+			case key == glfw.KeyF && mods == glfw.ModControl|glfw.ModShift:
+				DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, step).Mul4(DataShaderPtr.UniPtr.ViewUni)
+			case key == glfw.KeyB && mods == glfw.ModControl|glfw.ModShift:
+				DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, -step).Mul4(DataShaderPtr.UniPtr.ViewUni)
+		*/
 		/* move view*/
 	case key == glfw.KeyRight && mods == glfw.ModShift:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(-step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
+		GamePtr.TravelerPtr.Move(1, 0, 0)
+		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
+		// DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(-step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeyLeft && mods == glfw.ModShift:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
+		GamePtr.TravelerPtr.Move(-1, 0, 0)
+		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
+		// DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeyUp && mods == glfw.ModShift:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, -step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
+		GamePtr.TravelerPtr.Move(0, 1, 0)
+		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
+		// DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, -step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeyDown && mods == glfw.ModShift:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
+		GamePtr.TravelerPtr.Move(0, -1, 0)
+		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
+		// DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeyF && mods == glfw.ModShift:
 		fallthrough
 	case key == glfw.KeyF && mods == 0:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, -step).Mul4(DataShaderPtr.UniPtr.ViewUni)
+		GamePtr.TravelerPtr.Move(0, 0, 1)
+		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
+		// DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, -step).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeyB && mods == glfw.ModShift:
 		fallthrough
 	case key == glfw.KeyB && mods == 0:
-		DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, step).Mul4(DataShaderPtr.UniPtr.ViewUni)
+		GamePtr.TravelerPtr.Move(0, 0, -1)
+		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
+		// DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, step).Mul4(DataShaderPtr.UniPtr.ViewUni)
 
 		/* light */
 	case key == glfw.KeyL && mods == 0:
