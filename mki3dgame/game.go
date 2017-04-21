@@ -12,11 +12,11 @@ import (
 	"math/rand"
 )
 
-const BoxMargin = 40 // margin for bounding box of the stage
+const BoxMargin = 30 // margin for bounding box of the stage
 
 var FrameColor = mki3d.Vector3dType{1.0, 1.0, 1.0} // color of the bounding box frame
 
-var NumberOfMonsters = 4
+var NumberOfMonsters = 6
 
 // data structure for the game
 type Mki3dGame struct {
@@ -189,7 +189,13 @@ func (game *Mki3dGame) DrawMonsters() {
 	}
 }
 
-var MonsterSpeed float32 = 1
+func (game *Mki3dGame) UpdateMonsters() {
+	for _, m := range game.Monsters {
+		m.Update(game)
+	}
+}
+
+var MonsterSpeed float32 = 10
 
 // Parameters of a single monster
 type MonsterType struct {
@@ -216,7 +222,7 @@ func (m *MonsterType) Draw() {
 }
 
 // Update monster m in game g
-func (m *MonsterType) Update(g Mki3dGame) {
+func (m *MonsterType) Update(g *Mki3dGame) {
 	now := glfw.GetTime()
 	elapsed := float32(now - m.time)
 	m.time = now

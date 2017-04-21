@@ -149,17 +149,17 @@ func main() {
 		elapsed := time - previousTime
 		previousTime = time
 		_ = elapsed // do not forget!
-
+		game.UpdateMonsters()
 		game.Redraw()
 
 		// Maintenance
 		window.SwapBuffers()
-		glfw.WaitEvents()
+		// glfw.WaitEvents()
 		if doInMainThread != nil {
 			doInMainThread()     // execute required function
 			doInMainThread = nil // done
 		}
-		// glfw.PollEvents()
+		glfw.PollEvents()
 	}
 
 	// cleanup
