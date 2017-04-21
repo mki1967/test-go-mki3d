@@ -149,7 +149,7 @@ func main() {
 		elapsed := time - previousTime
 		previousTime = time
 		_ = elapsed // do not forget!
-		game.UpdateMonsters()
+		game.Update()
 		game.Redraw()
 
 		// Maintenance

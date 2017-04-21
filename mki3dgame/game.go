@@ -18,6 +18,8 @@ var FrameColor = mki3d.Vector3dType{1.0, 1.0, 1.0} // color of the bounding box 
 
 var NumberOfMonsters = 6
 
+var NumberOfTokens = 10
+
 // data structure for the game
 type Mki3dGame struct {
 	// assets info
@@ -37,6 +39,9 @@ type Mki3dGame struct {
 
 	Monsters []*MonsterType // set of monsters
 
+	Tokens []*TokenType // set of tokens
+
+	TokensRemaining int // number of remaining tokens
 }
 
 // Random position in the game stage box with the margin offset from the borders
@@ -145,11 +150,32 @@ func (game *Mki3dGame) InitToken() error {
 	}
 
 	game.TokenDSPtr = tokenDataShaderPtr
+	game.GenerateTokens()
 
 	return nil
 }
 
-// Load token shape and init the tokenDSPtr.
+func (game *Mki3dGame) GenerateTokens() {
+	game.Tokens = make([]*TokenType, NumberOfTokens)
+	for i := range game.Tokens {
+		game.Tokens[i] = MakeToken(game.RandPosition(BoxMargin), game.TokenDSPtr)
+	}
+	game.TokensRemaining = NumberOfTokens
+}
+
+func (game *Mki3dGame) DrawTokens() {
+	for _, t := range game.Tokens {
+		t.Draw()
+	}
+}
+
+func (game *Mki3dGame) UpdateTokens() {
+	for _, t := range game.Tokens {
+		t.Update(game)
+	}
+}
+
+// Load monster shape and init the monsters.
 func (game *Mki3dGame) InitMonster() error {
 
 	monsterPtr, err := game.AssetsPtr.LoadRandomMonster()
@@ -255,6 +281,39 @@ func (m *MonsterType) Update(g *Mki3dGame) {
 type TokenType struct {
 	Position  mgl32.Vec3
 	Collected bool
+	DSPtr     *tmki3d.DataShader // shape for redraw (may be shared by many)
+}
+
+// Creates a token  at position pos with datashader *dsptr
+func MakeToken(pos mgl32.Vec3, dsPtr *tmki3d.DataShader) *TokenType {
+	var t TokenType
+	t.Position = pos
+	t.DSPtr = dsPtr
+	t.Collected = false
+	return &t
+}
+
+// Redraw token m
+func (t *TokenType) Draw() {
+	if t.Collected {
+		return
+	}
+
+	t.DSPtr.UniPtr.SetModelPosition(t.Position)
+	t.DSPtr.DrawModel()
+}
+
+// square of the distance to collect token
+const TokenCollectionSqrDist = 1
+
+// Update monster m in game g
+func (t *TokenType) Update(g *Mki3dGame) {
+	v := t.Position.Sub(g.TravelerPtr.Position)
+	if v.Dot(v) < TokenCollectionSqrDist {
+		t.Collected = true
+		g.TokensRemaining--
+		// some celebrations ...
+	}
 }
 
 // Load stage shape and init the related data.
@@ -390,6 +449,11 @@ func (game *Mki3dGame) copmuteFrame() {
 
 }
 
+func (game *Mki3dGame) Update() {
+	game.UpdateMonsters()
+	game.UpdateTokens()
+}
+
 // Redraw the game stage
 func (game *Mki3dGame) Redraw() {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT) // to be moved to redraw ?
@@ -399,7 +463,8 @@ func (game *Mki3dGame) Redraw() {
 	// draw frame
 	game.FrameDSPtr.DrawModel()
 	// draw tokens
-	game.TokenDSPtr.DrawModel()
+	// game.TokenDSPtr.DrawModel()
+	game.DrawTokens()
 	// draw monsters
 	// game.MonsterDSPtr.DrawModel()
 	game.DrawMonsters()
