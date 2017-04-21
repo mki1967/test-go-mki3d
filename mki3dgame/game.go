@@ -4,10 +4,10 @@ import (
 	"fmt" // tests
 	// "errors"
 	"github.com/go-gl/gl/v3.3-core/gl"
+	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/go-mki3d/mki3d"
 	"github.com/mki1967/test-go-mki3d/tmki3d"
-	// "github.com/go-gl/glfw/v3.2/glfw"
 	"math"
 	"math/rand"
 )
@@ -15,6 +15,8 @@ import (
 const BoxMargin = 40 // margin for bounding box of the stage
 
 var FrameColor = mki3d.Vector3dType{1.0, 1.0, 1.0} // color of the bounding box frame
+
+var NumberOfMonsters = 4
 
 // data structure for the game
 type Mki3dGame struct {
@@ -32,6 +34,8 @@ type Mki3dGame struct {
 	VMin, VMax mgl32.Vec3 // corners of the bounding box of the stage (computed with the BoxMargin)
 
 	TravelerPtr *Traveler // the first person (the player)
+
+	Monsters []*MonsterType // set of monsters
 
 }
 
@@ -166,19 +170,83 @@ func (game *Mki3dGame) InitMonster() error {
 
 	game.MonsterDSPtr = monsterDataShaderPtr
 
-	game.MonsterDSPtr.UniPtr.SetModelPosition(game.RandPosition(BoxMargin)) // test
+	// game.MonsterDSPtr.UniPtr.SetModelPosition(game.RandPosition(BoxMargin)) // test
+	game.GenerateMonsters()
 
 	return nil
 }
 
+func (game *Mki3dGame) GenerateMonsters() {
+	game.Monsters = make([]*MonsterType, NumberOfMonsters)
+	for i := range game.Monsters {
+		game.Monsters[i] = MakeMonster(game.RandPosition(0), game.MonsterDSPtr)
+	}
+}
+
+func (game *Mki3dGame) DrawMonsters() {
+	for _, m := range game.Monsters {
+		m.Draw()
+	}
+}
+
+var MonsterSpeed float32 = 1
+
 // Parameters of a single monster
-type MonsterData struct {
-	Position mgl32.Vec3
-	Speed    mgl32.Vec3
+type MonsterType struct {
+	Position mgl32.Vec3         // current position
+	Speed    mgl32.Vec3         // speed vector
+	DSPtr    *tmki3d.DataShader // shape for redraw (may be shared by many)
+	time     float64            // last update time
+}
+
+// Creates a monster wth random speed direction at position pos with datashader *dsptr
+func MakeMonster(pos mgl32.Vec3, dsPtr *tmki3d.DataShader) *MonsterType {
+	var m MonsterType
+	m.Position = pos
+	m.DSPtr = dsPtr
+	m.Speed = RandRotated(mgl32.Vec3{0, 0, MonsterSpeed})
+	m.time = glfw.GetTime()
+	return &m
+}
+
+// Redraw monster m
+func (m *MonsterType) Draw() {
+	m.DSPtr.UniPtr.SetModelPosition(m.Position)
+	m.DSPtr.DrawModel()
+}
+
+// Update monster m in game g
+func (m *MonsterType) Update(g Mki3dGame) {
+	now := glfw.GetTime()
+	elapsed := float32(now - m.time)
+	m.time = now
+
+	dv := m.Speed.Mul(elapsed)
+	m.Position = m.Position.Add(dv)
+	if m.Position[0] >= g.VMax[0] {
+		m.Speed[0] = float32(-math.Abs(float64(m.Speed[0])))
+	}
+	if m.Position[0] <= g.VMin[0] {
+		m.Speed[0] = float32(math.Abs(float64(m.Speed[0])))
+	}
+
+	if m.Position[1] >= g.VMax[1] {
+		m.Speed[1] = float32(-math.Abs(float64(m.Speed[1])))
+	}
+	if m.Position[1] <= g.VMin[1] {
+		m.Speed[1] = float32(math.Abs(float64(m.Speed[1])))
+	}
+
+	if m.Position[2] >= g.VMax[2] {
+		m.Speed[2] = float32(-math.Abs(float64(m.Speed[2])))
+	}
+	if m.Position[2] <= g.VMin[2] {
+		m.Speed[2] = float32(math.Abs(float64(m.Speed[2])))
+	}
 }
 
 // Parameters of a single token
-type TokenData struct {
+type TokenType struct {
 	Position  mgl32.Vec3
 	Collected bool
 }
@@ -327,7 +395,8 @@ func (game *Mki3dGame) Redraw() {
 	// draw tokens
 	game.TokenDSPtr.DrawModel()
 	// draw monsters
-	game.MonsterDSPtr.DrawModel()
+	// game.MonsterDSPtr.DrawModel()
+	game.DrawMonsters()
 
 	// draw sectors
 	gl.Disable(gl.DEPTH_TEST)
@@ -375,6 +444,13 @@ func (rot *RotHVType) ViewerRotatedVector(vector mgl32.Vec3) mgl32.Vec3 {
 		-s2*s1*vector[0] + c2*vector[1] - s2*c1*vector[2],
 		c2*s1*vector[0] + s2*vector[1] + c2*c1*vector[2],
 	}
+}
+
+func RandRotated(vec mgl32.Vec3) mgl32.Vec3 {
+	var rot RotHVType
+	rot.XZ = rand.Float64() * 360
+	rot.YZ = rand.Float64() * 360
+	return rot.WorldRotatedVector(vec)
 }
 
 func (t *Traveler) ViewMatrix() mgl32.Mat4 {
