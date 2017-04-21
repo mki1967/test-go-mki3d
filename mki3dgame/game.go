@@ -281,21 +281,26 @@ func (game *Mki3dGame) Redraw() {
 
 }
 
+// RotHVType represents sequence of two rotations:
+// by the angle XY on XY-plane and by the angle YZ on YZ-plane
+// (in degrees)
+type RotHVType struct {
+	XZ float64
+	YZ float64
+}
+
 type Traveler struct {
 	Position mgl32.Vec3 // position
-	/* orientation */
-	RotXZ float64 // horizontal rotation (in degrees)
-	RotYZ float64 // vertical rotation (in degrees)
-
+	Rot      RotHVType  // orientation
 }
 
 const degToRadians = math.Pi / 180
 
-func (t *Traveler) WorldRotatedVector(vector mgl32.Vec3) mgl32.Vec3 {
-	c1 := float32(math.Cos(t.RotXZ * degToRadians))
-	s1 := float32(math.Sin(t.RotXZ * degToRadians))
-	c2 := float32(math.Cos(t.RotYZ * degToRadians))
-	s2 := float32(math.Sin(t.RotYZ * degToRadians))
+func (rot *RotHVType) WorldRotatedVector(vector mgl32.Vec3) mgl32.Vec3 {
+	c1 := float32(math.Cos(rot.XZ * degToRadians))
+	s1 := float32(math.Sin(rot.XZ * degToRadians))
+	c2 := float32(math.Cos(rot.YZ * degToRadians))
+	s2 := float32(math.Sin(rot.YZ * degToRadians))
 
 	return mgl32.Vec3{
 		c1*vector[0] - s1*s2*vector[1] - s1*c2*vector[2],
@@ -304,11 +309,11 @@ func (t *Traveler) WorldRotatedVector(vector mgl32.Vec3) mgl32.Vec3 {
 	}
 }
 
-func (t *Traveler) ViewerRotatedVector(vector mgl32.Vec3) mgl32.Vec3 {
-	c1 := float32(math.Cos(-t.RotXZ * degToRadians))
-	s1 := float32(math.Sin(-t.RotXZ * degToRadians))
-	c2 := float32(math.Cos(-t.RotYZ * degToRadians))
-	s2 := float32(math.Sin(-t.RotYZ * degToRadians))
+func (rot *RotHVType) ViewerRotatedVector(vector mgl32.Vec3) mgl32.Vec3 {
+	c1 := float32(math.Cos(-rot.XZ * degToRadians))
+	s1 := float32(math.Sin(-rot.XZ * degToRadians))
+	c2 := float32(math.Cos(-rot.YZ * degToRadians))
+	s2 := float32(math.Sin(-rot.YZ * degToRadians))
 
 	return mgl32.Vec3{
 		c1*vector[0] - s1*vector[2],
@@ -318,13 +323,13 @@ func (t *Traveler) ViewerRotatedVector(vector mgl32.Vec3) mgl32.Vec3 {
 }
 
 func (t *Traveler) ViewMatrix() mgl32.Mat4 {
-	c1 := float32(math.Cos(-t.RotXZ * degToRadians))
-	s1 := float32(math.Sin(-t.RotXZ * degToRadians))
+	c1 := float32(math.Cos(-t.Rot.XZ * degToRadians))
+	s1 := float32(math.Sin(-t.Rot.XZ * degToRadians))
 
-	c2 := float32(math.Cos(-t.RotYZ * degToRadians))
-	s2 := float32(math.Sin(-t.RotYZ * degToRadians))
+	c2 := float32(math.Cos(-t.Rot.YZ * degToRadians))
+	s2 := float32(math.Sin(-t.Rot.YZ * degToRadians))
 
-	v := t.ViewerRotatedVector(t.Position.Mul(-1))
+	v := t.Rot.ViewerRotatedVector(t.Position.Mul(-1))
 
 	// row-major ??
 	return mgl32.Mat4{
@@ -336,7 +341,7 @@ func (t *Traveler) ViewMatrix() mgl32.Mat4 {
 }
 
 func (t *Traveler) Move(dx, dy, dz float32) {
-	v := t.WorldRotatedVector(mgl32.Vec3{dx, dy, dz})
+	v := t.Rot.WorldRotatedVector(mgl32.Vec3{dx, dy, dz})
 	t.Position = t.Position.Add(v)
 
 	// check bounds and other conditions ...

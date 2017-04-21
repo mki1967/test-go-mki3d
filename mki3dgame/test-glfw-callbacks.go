@@ -40,23 +40,23 @@ func KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action,
 
 	/* rotate view */
 	case key == glfw.KeyRight && mods == 0:
-		GamePtr.TravelerPtr.RotXZ -= 1 // degree
+		GamePtr.TravelerPtr.Rot.XZ -= 1 // degree
 		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
 		// DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DY(-angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeyLeft && mods == 0:
-		GamePtr.TravelerPtr.RotXZ += 1 // degree
+		GamePtr.TravelerPtr.Rot.XZ += 1 // degree
 		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
 		// DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DY(angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeyUp && mods == 0:
-		GamePtr.TravelerPtr.RotYZ -= 1 // degree
+		GamePtr.TravelerPtr.Rot.YZ -= 1 // degree
 		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
 		// DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DX(angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeyDown && mods == 0:
-		GamePtr.TravelerPtr.RotYZ += 1 // degree
+		GamePtr.TravelerPtr.Rot.YZ += 1 // degree
 		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
 		// DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DX(-angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
 	case key == glfw.KeySpace:
-		GamePtr.TravelerPtr.RotYZ = 0 // degree
+		GamePtr.TravelerPtr.Rot.YZ = 0 // degree
 		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
 
 		/* move model*/
