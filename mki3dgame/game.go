@@ -56,6 +56,30 @@ func MakeEmptyGame(pathToAssets string) (*Mki3dGame, error) {
 	return &game, nil
 }
 
+// Load data and init game for the first stage
+func (game *Mki3dGame) Init(width, height int) (err error) {
+	err = game.InitSectors()
+	if err != nil {
+		return err
+	}
+
+	err = game.InitStage(width, height)
+	if err != nil {
+		return err
+	}
+
+	err = game.InitToken()
+	if err != nil {
+		return err
+	}
+
+	err = game.InitMonster()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Load sectors shape and init the SectorsDSPtr.
 func (game *Mki3dGame) InitSectors() error {
 

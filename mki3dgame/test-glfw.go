@@ -117,22 +117,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = game.InitSectors()
-	if err != nil {
-		panic(err)
-	}
-
-	err = game.InitStage(width, height)
-	if err != nil {
-		panic(err)
-	}
-
-	err = game.InitToken()
-	if err != nil {
-		panic(err)
-	}
-
-	err = game.InitMonster()
+	err = game.Init(width, height)
 	if err != nil {
 		panic(err)
 	}
