@@ -89,6 +89,10 @@ func ViewMatrix(v mki3d.ViewType) mgl32.Mat4 {
 
 }
 
+func (glUni *GLUni) SetModelPosition(pos mgl32.Vec3) {
+	glUni.ModelUni.SetCol(3, pos.Vec4(1))
+}
+
 // Sets uniform projection matrix of glUni based on the data from mki3dData and on the width and height (of the display window).
 // The function panics if mki3dData == nil
 func (glUni *GLUni) SetProjectionFromMki3d(mki3dData *mki3d.Mki3dType, width, height int) {

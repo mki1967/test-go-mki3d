@@ -8,8 +8,8 @@ import (
 	"github.com/mki1967/go-mki3d/mki3d"
 	"github.com/mki1967/test-go-mki3d/tmki3d"
 	// "github.com/go-gl/glfw/v3.2/glfw"
-	// "math/rand"
 	"math"
+	"math/rand"
 )
 
 const BoxMargin = 40 // margin for bounding box of the stage
@@ -33,6 +33,23 @@ type Mki3dGame struct {
 
 	TravelerPtr *Traveler // the first person (the player)
 
+}
+
+// Random position in the game stage box with the margin offset from the borders
+func (game *Mki3dGame) RandPosition(margin float32) mgl32.Vec3 {
+	m := mgl32.Vec3{margin, margin, margin}
+	v1 := game.VMin.Add(m)
+	v2 := game.VMax.Sub(m)
+	return RandPosition(v1, v2)
+}
+
+// Random position in the box [vmin, vmax]
+func RandPosition(vmin, vmax mgl32.Vec3) mgl32.Vec3 {
+	return mgl32.Vec3{
+		rand.Float32()*(vmax[0]-vmin[0]) + vmin[0],
+		rand.Float32()*(vmax[1]-vmin[1]) + vmin[1],
+		rand.Float32()*(vmax[2]-vmin[2]) + vmin[2],
+	}
 }
 
 // Make game structure with the shader and without any data.
@@ -149,7 +166,21 @@ func (game *Mki3dGame) InitMonster() error {
 
 	game.MonsterDSPtr = monsterDataShaderPtr
 
+	game.MonsterDSPtr.UniPtr.SetModelPosition(game.RandPosition(BoxMargin)) // test
+
 	return nil
+}
+
+// Parameters of a single monster
+type MonsterData struct {
+	Position mgl32.Vec3
+	Speed    mgl32.Vec3
+}
+
+// Parameters of a single token
+type TokenData struct {
+	Position  mgl32.Vec3
+	Collected bool
 }
 
 // Load stage shape and init the related data.
