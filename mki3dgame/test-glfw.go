@@ -85,8 +85,8 @@ func main() {
 		panic(err)
 	}
 
-	version := gl.GoStr(gl.GetString(gl.VERSION))
-	fmt.Println("OpenGL version", version)
+	// version := gl.GoStr(gl.GetString(gl.VERSION))
+	// fmt.Println("OpenGL version", version)
 
 	// Configure global settings
 	gl.Enable(gl.MULTISAMPLE) // probably not needed ...
@@ -137,19 +137,18 @@ func main() {
 	// setting callbacks
 	window.SetSizeCallback(SizeCallback)
 	window.SetKeyCallback(KeyCallback)
-
+	window.SetMouseButtonCallback(Mki3dMouseButtonCallback)
 	message(helpText) // initial help message
 
-	previousTime := glfw.GetTime()
 	// main loop
 	for !window.ShouldClose() {
 
-		// Update
-		time := glfw.GetTime()
-		elapsed := time - previousTime
-		previousTime = time
-		_ = elapsed // do not forget!
+		game.ProbeTime()
 		game.Update()
+		if game.CurrentAction != nil {
+			game.CurrentAction()
+			GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
+		}
 		game.Redraw()
 
 		// Maintenance

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt" // tests
+	// "fmt" // tests
 	"io/ioutil"
 	// "errors"
 	"github.com/mki1967/go-mki3d/mki3d"
@@ -68,7 +68,7 @@ func LoadAssets(pathToAssets string) (*Assets, error) {
 		return &assets, err
 	}
 
-	fmt.Printf("%+v\n", assets) // tests
+	// fmt.Printf("%+v\n", assets) // tests
 	return &assets, nil
 }
 

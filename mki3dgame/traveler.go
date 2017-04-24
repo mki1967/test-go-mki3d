@@ -12,9 +12,14 @@ import (
 	// "math/rand"
 )
 
+const TravelerMovSpeed = 10 // units per second
+const TravelerRotSpeed = 90 // degrees per second
+
 type Traveler struct {
 	Position mgl32.Vec3 // position
 	Rot      RotHVType  // orientation
+	MovSpeed float64
+	RotSpeed float64
 }
 
 func (t *Traveler) ViewMatrix() mgl32.Mat4 {
@@ -39,12 +44,37 @@ func (t *Traveler) Move(dx, dy, dz float32) {
 	v := t.Rot.WorldRotatedVector(mgl32.Vec3{dx, dy, dz})
 	t.Position = t.Position.Add(v)
 
-	// check bounds and other conditions ...
+}
+
+func (t *Traveler) ClipToBox(vmin, vmax mgl32.Vec3) {
+
+	if t.Position[0] > vmax[0] {
+		t.Position[0] = vmax[0]
+	}
+	if t.Position[0] < vmin[0] {
+		t.Position[0] = vmin[0]
+	}
+
+	if t.Position[1] > vmax[1] {
+		t.Position[1] = vmax[1]
+	}
+	if t.Position[1] < vmin[1] {
+		t.Position[1] = vmin[1]
+	}
+
+	if t.Position[2] > vmax[2] {
+		t.Position[2] = vmax[2]
+	}
+	if t.Position[1] < vmin[1] {
+		t.Position[2] = vmin[2]
+	}
 
 }
 
 func MakeTraveler(position mgl32.Vec3) *Traveler {
 	var t Traveler
 	t.Position = position
+	t.MovSpeed = TravelerMovSpeed
+	t.RotSpeed = TravelerRotSpeed
 	return &t
 }

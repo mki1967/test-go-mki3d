@@ -4,7 +4,7 @@ import (
 	"fmt" // tests
 	// "errors"
 	"github.com/go-gl/gl/v3.3-core/gl"
-	// "github.com/go-gl/glfw/v3.2/glfw"
+	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/go-mki3d/mki3d"
 	"github.com/mki1967/test-go-mki3d/tmki3d"
@@ -46,8 +46,11 @@ type Mki3dGame struct {
 
 	TokensRemaining int // number of remaining tokens
 
+	LastProbedTime float64 // game global time probing
+	LastTimeDelta  float64 // game global time probing
+
 	CurrentAction func()                                     // current action of the player
-	ActionSectors [HorizontalSectors][VerticalSectors]func() // functions of the mouse actions
+	ActionSectors [VerticalSectors][HorizontalSectors]func() // functions of the mouse actions
 }
 
 // Make game structure with the shader and without any data.
@@ -68,7 +71,10 @@ func MakeEmptyGame(pathToAssets string) (*Mki3dGame, error) {
 		return nil, err
 	}
 	game.AssetsPtr = assetsPtr
+
+	game.InitActionSectors()
 	return &game, nil
+
 }
 
 // Load data and init game for the first stage
@@ -92,7 +98,19 @@ func (game *Mki3dGame) Init(width, height int) (err error) {
 	if err != nil {
 		return err
 	}
+
+	// init time probe
+	game.LastProbedTime = glfw.GetTime()
+	game.LastTimeDelta = 0
+
 	return nil
+}
+
+// Use this function to  before the actions.
+func (game *Mki3dGame) ProbeTime() {
+	now := glfw.GetTime()
+	game.LastTimeDelta = now - game.LastProbedTime
+	game.LastProbedTime = now
 }
 
 // Load sectors shape and init the SectorsDSPtr.
@@ -365,9 +383,11 @@ func (game *Mki3dGame) Redraw() {
 	// draw monsters
 	game.DrawMonsters()
 
-	// draw sectors
-	gl.Disable(gl.DEPTH_TEST)
-	game.SectorsDSPtr.DrawStage()
-	gl.Enable(gl.DEPTH_TEST)
+	if game.CurrentAction == nil {
+		// draw sectors
+		gl.Disable(gl.DEPTH_TEST)
+		game.SectorsDSPtr.DrawStage()
+		gl.Enable(gl.DEPTH_TEST)
+	}
 
 }
