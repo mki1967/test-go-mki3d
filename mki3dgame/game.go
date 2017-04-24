@@ -9,7 +9,7 @@ import (
 	"github.com/mki1967/go-mki3d/mki3d"
 	"github.com/mki1967/test-go-mki3d/tmki3d"
 	// "math"
-	"math/rand"
+	// "math/rand"
 )
 
 const BoxMargin = 30 // margin for bounding box of the stage
@@ -19,6 +19,9 @@ var FrameColor = mki3d.Vector3dType{1.0, 1.0, 1.0} // color of the bounding box 
 var NumberOfMonsters = 6
 
 var NumberOfTokens = 10
+
+const VerticalSectors = 6   // vertical dimmension of sectors array
+const HorizontalSectors = 6 // horizontal  dimmension of sectors array
 
 // data structure for the game
 type Mki3dGame struct {
@@ -43,23 +46,8 @@ type Mki3dGame struct {
 
 	TokensRemaining int // number of remaining tokens
 
-}
-
-// Random position in the game stage box with the margin offset from the borders
-func (game *Mki3dGame) RandPosition(margin float32) mgl32.Vec3 {
-	m := mgl32.Vec3{margin, margin, margin}
-	v1 := game.VMin.Add(m)
-	v2 := game.VMax.Sub(m)
-	return RandPosition(v1, v2)
-}
-
-// Random position in the box [vmin, vmax]
-func RandPosition(vmin, vmax mgl32.Vec3) mgl32.Vec3 {
-	return mgl32.Vec3{
-		rand.Float32()*(vmax[0]-vmin[0]) + vmin[0],
-		rand.Float32()*(vmax[1]-vmin[1]) + vmin[1],
-		rand.Float32()*(vmax[2]-vmin[2]) + vmin[2],
-	}
+	CurrentAction func()                                     // current action of the player
+	ActionSectors [HorizontalSectors][VerticalSectors]func() // functions of the mouse actions
 }
 
 // Make game structure with the shader and without any data.
@@ -219,45 +207,6 @@ func (game *Mki3dGame) DrawMonsters() {
 func (game *Mki3dGame) UpdateMonsters() {
 	for _, m := range game.Monsters {
 		m.Update(game)
-	}
-}
-
-// Parameters of a single token
-type TokenType struct {
-	Position  mgl32.Vec3
-	Collected bool
-	DSPtr     *tmki3d.DataShader // shape for redraw (may be shared by many)
-}
-
-// Creates a token  at position pos with datashader *dsptr
-func MakeToken(pos mgl32.Vec3, dsPtr *tmki3d.DataShader) *TokenType {
-	var t TokenType
-	t.Position = pos
-	t.DSPtr = dsPtr
-	t.Collected = false
-	return &t
-}
-
-// Redraw token m
-func (t *TokenType) Draw() {
-	if t.Collected {
-		return
-	}
-
-	t.DSPtr.UniPtr.SetModelPosition(t.Position)
-	t.DSPtr.DrawModel()
-}
-
-// square of the distance to collect token
-const TokenCollectionSqrDist = 1
-
-// Update monster m in game g
-func (t *TokenType) Update(g *Mki3dGame) {
-	v := t.Position.Sub(g.TravelerPtr.Position)
-	if v.Dot(v) < TokenCollectionSqrDist {
-		t.Collected = true
-		g.TokensRemaining--
-		// some celebrations ...
 	}
 }
 

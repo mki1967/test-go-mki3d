@@ -12,6 +12,23 @@ import (
 	"math/rand"
 )
 
+// Random position in the game stage box with the margin offset from the borders
+func (game *Mki3dGame) RandPosition(margin float32) mgl32.Vec3 {
+	m := mgl32.Vec3{margin, margin, margin}
+	v1 := game.VMin.Add(m)
+	v2 := game.VMax.Sub(m)
+	return RandPosition(v1, v2)
+}
+
+// Random position in the box [vmin, vmax]
+func RandPosition(vmin, vmax mgl32.Vec3) mgl32.Vec3 {
+	return mgl32.Vec3{
+		rand.Float32()*(vmax[0]-vmin[0]) + vmin[0],
+		rand.Float32()*(vmax[1]-vmin[1]) + vmin[1],
+		rand.Float32()*(vmax[2]-vmin[2]) + vmin[2],
+	}
+}
+
 // RotHVType represents sequence of two rotations:
 // by the angle XY on XY-plane and by the angle YZ on YZ-plane
 // (in degrees)

@@ -13,3 +13,24 @@ import (
 	"math/rand"
 )
 */
+
+func (g Mki3dGame) InitActionSectors() {
+}
+
+func (g Mki3dGame) ActionMoveForward() {
+}
+
+func (g Mki3dGame) ActionMoveBackward() {
+}
+
+func (g Mki3dGame) ActionMoveLeft() {
+}
+
+func (g Mki3dGame) ActionMoveRight() {
+}
+
+func (g Mki3dGame) ActionMoveUp() {
+}
+
+func (g Mki3dGame) ActionMoveDown() {
+}
