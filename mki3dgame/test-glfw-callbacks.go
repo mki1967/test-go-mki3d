@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
@@ -108,6 +108,18 @@ func KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action,
 	case key == glfw.KeyL && mods == 0:
 		DataShaderPtr.UniPtr.LightUni = DataShaderPtr.UniPtr.ViewUni.Mat3().Inv().Mul3x1(mgl32.Vec3{0, 0, 1}).Normalize()
 
+	case key == glfw.KeyZ && mods == 0: /* zoom out */
+		width, height := w.GetSize()
+		zy := DataShaderPtr.Mki3dPtr.Projection.ZoomY / 1.1
+		fmt.Println("ZoomY: ", zy)
+		DataShaderPtr.Mki3dPtr.Projection.ZoomY = zy
+		DataShaderPtr.UniPtr.SetProjectionFromMki3d(DataShaderPtr.Mki3dPtr, width, height)
+	case key == glfw.KeyZ && mods == glfw.ModShift: /* zoom in */
+		width, height := w.GetSize()
+		zy := DataShaderPtr.Mki3dPtr.Projection.ZoomY * 1.1
+		fmt.Println("ZoomY: ", zy)
+		DataShaderPtr.Mki3dPtr.Projection.ZoomY = zy
+		DataShaderPtr.UniPtr.SetProjectionFromMki3d(DataShaderPtr.Mki3dPtr, width, height)
 		/* help */
 	case key == glfw.KeyH && mods == 0:
 		message(helpText)

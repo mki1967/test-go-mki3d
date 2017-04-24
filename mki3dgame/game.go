@@ -4,11 +4,11 @@ import (
 	"fmt" // tests
 	// "errors"
 	"github.com/go-gl/gl/v3.3-core/gl"
-	"github.com/go-gl/glfw/v3.2/glfw"
+	// "github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/go-mki3d/mki3d"
 	"github.com/mki1967/test-go-mki3d/tmki3d"
-	"math"
+	// "math"
 	"math/rand"
 )
 
@@ -42,6 +42,7 @@ type Mki3dGame struct {
 	Tokens []*TokenType // set of tokens
 
 	TokensRemaining int // number of remaining tokens
+
 }
 
 // Random position in the game stage box with the margin offset from the borders
@@ -221,62 +222,6 @@ func (game *Mki3dGame) UpdateMonsters() {
 	}
 }
 
-var MonsterSpeed float32 = 10
-
-// Parameters of a single monster
-type MonsterType struct {
-	Position mgl32.Vec3         // current position
-	Speed    mgl32.Vec3         // speed vector
-	DSPtr    *tmki3d.DataShader // shape for redraw (may be shared by many)
-	time     float64            // last update time
-}
-
-// Creates a monster wth random speed direction at position pos with datashader *dsptr
-func MakeMonster(pos mgl32.Vec3, dsPtr *tmki3d.DataShader) *MonsterType {
-	var m MonsterType
-	m.Position = pos
-	m.DSPtr = dsPtr
-	m.Speed = RandRotated(mgl32.Vec3{0, 0, MonsterSpeed})
-	m.time = glfw.GetTime()
-	return &m
-}
-
-// Redraw monster m
-func (m *MonsterType) Draw() {
-	m.DSPtr.UniPtr.SetModelPosition(m.Position)
-	m.DSPtr.DrawModel()
-}
-
-// Update monster m in game g
-func (m *MonsterType) Update(g *Mki3dGame) {
-	now := glfw.GetTime()
-	elapsed := float32(now - m.time)
-	m.time = now
-
-	dv := m.Speed.Mul(elapsed)
-	m.Position = m.Position.Add(dv)
-	if m.Position[0] >= g.VMax[0] {
-		m.Speed[0] = float32(-math.Abs(float64(m.Speed[0])))
-	}
-	if m.Position[0] <= g.VMin[0] {
-		m.Speed[0] = float32(math.Abs(float64(m.Speed[0])))
-	}
-
-	if m.Position[1] >= g.VMax[1] {
-		m.Speed[1] = float32(-math.Abs(float64(m.Speed[1])))
-	}
-	if m.Position[1] <= g.VMin[1] {
-		m.Speed[1] = float32(math.Abs(float64(m.Speed[1])))
-	}
-
-	if m.Position[2] >= g.VMax[2] {
-		m.Speed[2] = float32(-math.Abs(float64(m.Speed[2])))
-	}
-	if m.Position[2] <= g.VMin[2] {
-		m.Speed[2] = float32(math.Abs(float64(m.Speed[2])))
-	}
-}
-
 // Parameters of a single token
 type TokenType struct {
 	Position  mgl32.Vec3
@@ -316,6 +261,8 @@ func (t *TokenType) Update(g *Mki3dGame) {
 	}
 }
 
+const InitStageZoomY = 2.5
+
 // Load stage shape and init the related data.
 func (game *Mki3dGame) InitStage(width, height int) error {
 
@@ -330,7 +277,9 @@ func (game *Mki3dGame) InitStage(width, height int) error {
 	}
 
 	stageDataShaderPtr.UniPtr.SetSimple()
-	stageDataShaderPtr.UniPtr.SetProjectionFromMki3d(stagePtr, width, height)
+	stageDataShaderPtr.Mki3dPtr.Projection.ZoomY = InitStageZoomY
+	stageDataShaderPtr.UniPtr.SetProjectionFromMki3d(stageDataShaderPtr.Mki3dPtr, width, height)
+	// stageDataShaderPtr.UniPtr.SetProjectionFromMki3d(stagePtr, width, height)
 	stageDataShaderPtr.UniPtr.SetLightFromMki3d(stagePtr)
 
 	stageDataShaderPtr.UniPtr.ViewUni = mgl32.Ident4()
@@ -463,10 +412,8 @@ func (game *Mki3dGame) Redraw() {
 	// draw frame
 	game.FrameDSPtr.DrawModel()
 	// draw tokens
-	// game.TokenDSPtr.DrawModel()
 	game.DrawTokens()
 	// draw monsters
-	// game.MonsterDSPtr.DrawModel()
 	game.DrawMonsters()
 
 	// draw sectors
@@ -474,84 +421,4 @@ func (game *Mki3dGame) Redraw() {
 	game.SectorsDSPtr.DrawStage()
 	gl.Enable(gl.DEPTH_TEST)
 
-}
-
-// RotHVType represents sequence of two rotations:
-// by the angle XY on XY-plane and by the angle YZ on YZ-plane
-// (in degrees)
-type RotHVType struct {
-	XZ float64
-	YZ float64
-}
-
-type Traveler struct {
-	Position mgl32.Vec3 // position
-	Rot      RotHVType  // orientation
-}
-
-const degToRadians = math.Pi / 180
-
-func (rot *RotHVType) WorldRotatedVector(vector mgl32.Vec3) mgl32.Vec3 {
-	c1 := float32(math.Cos(rot.XZ * degToRadians))
-	s1 := float32(math.Sin(rot.XZ * degToRadians))
-	c2 := float32(math.Cos(rot.YZ * degToRadians))
-	s2 := float32(math.Sin(rot.YZ * degToRadians))
-
-	return mgl32.Vec3{
-		c1*vector[0] - s1*s2*vector[1] - s1*c2*vector[2],
-		c2*vector[1] - s2*vector[2],
-		s1*vector[0] + c1*s2*vector[1] + c1*c2*vector[2],
-	}
-}
-
-func (rot *RotHVType) ViewerRotatedVector(vector mgl32.Vec3) mgl32.Vec3 {
-	c1 := float32(math.Cos(-rot.XZ * degToRadians))
-	s1 := float32(math.Sin(-rot.XZ * degToRadians))
-	c2 := float32(math.Cos(-rot.YZ * degToRadians))
-	s2 := float32(math.Sin(-rot.YZ * degToRadians))
-
-	return mgl32.Vec3{
-		c1*vector[0] - s1*vector[2],
-		-s2*s1*vector[0] + c2*vector[1] - s2*c1*vector[2],
-		c2*s1*vector[0] + s2*vector[1] + c2*c1*vector[2],
-	}
-}
-
-func RandRotated(vec mgl32.Vec3) mgl32.Vec3 {
-	var rot RotHVType
-	rot.XZ = rand.Float64() * 360
-	rot.YZ = rand.Float64() * 360
-	return rot.WorldRotatedVector(vec)
-}
-
-func (t *Traveler) ViewMatrix() mgl32.Mat4 {
-	c1 := float32(math.Cos(-t.Rot.XZ * degToRadians))
-	s1 := float32(math.Sin(-t.Rot.XZ * degToRadians))
-
-	c2 := float32(math.Cos(-t.Rot.YZ * degToRadians))
-	s2 := float32(math.Sin(-t.Rot.YZ * degToRadians))
-
-	v := t.Rot.ViewerRotatedVector(t.Position.Mul(-1))
-
-	// row-major ??
-	return mgl32.Mat4{
-		c1, 0, -s1, v[0],
-		-s2 * s1, c2, -s2 * c1, v[1],
-		c2 * s1, s2, c2 * c1, v[2],
-		0, 0, 0, 1,
-	}.Transpose()
-}
-
-func (t *Traveler) Move(dx, dy, dz float32) {
-	v := t.Rot.WorldRotatedVector(mgl32.Vec3{dx, dy, dz})
-	t.Position = t.Position.Add(v)
-
-	// check bounds and other conditions ...
-
-}
-
-func MakeTraveler(position mgl32.Vec3) *Traveler {
-	var t Traveler
-	t.Position = position
-	return &t
 }
