@@ -65,7 +65,7 @@ func (t *Traveler) ClipToBox(vmin, vmax mgl32.Vec3) {
 	if t.Position[2] > vmax[2] {
 		t.Position[2] = vmax[2]
 	}
-	if t.Position[1] < vmin[1] {
+	if t.Position[2] < vmin[2] {
 		t.Position[2] = vmin[2]
 	}
 
