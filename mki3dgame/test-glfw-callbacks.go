@@ -5,7 +5,7 @@ import (
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
-	"math"
+	// "math"
 	// "github.com/mki1967/go-mki3d/mki3d"
 	"github.com/mki1967/test-go-mki3d/tmki3d"
 )
@@ -18,115 +18,73 @@ func SizeCallback(w *glfw.Window, width int, height int) {
 
 func KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
 	if action == glfw.Release {
-		return
+		if action == glfw.Release {
+			GamePtr.CancelAction()
+			return
+		}
+
 	}
 
-	const angle = 1 * math.Pi / 180
-	const step = 0.5
+	if action == glfw.Press {
+		g := GamePtr // short name
+		switch {
 
-	switch {
+		/* rotate player */
+		case key == glfw.KeyRight && mods == 0:
+			g.SetAction(g.ActionRotRight)
+		case key == glfw.KeyLeft && mods == 0:
+			g.SetAction(g.ActionRotLeft)
 
-	/* rotate model */
-	/*
-		case key == glfw.KeyRight && mods == glfw.ModControl:
-			DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DY(angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
-		case key == glfw.KeyLeft && mods == glfw.ModControl:
-			DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DY(-angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
-		case key == glfw.KeyUp && mods == glfw.ModControl:
-			DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DX(-angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
-		case key == glfw.KeyDown && mods == glfw.ModControl:
-			DataShaderPtr.UniPtr.ModelUni = mgl32.HomogRotate3DX(angle).Mul4(DataShaderPtr.UniPtr.ModelUni)
-	*/
+		case key == glfw.KeyUp && mods == 0:
+			g.SetAction(g.ActionRotUp)
 
-	/* rotate view */
-	case key == glfw.KeyRight && mods == 0:
-		GamePtr.TravelerPtr.Rot.XZ -= 1 // degree
-		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
-		// DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DY(-angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeyLeft && mods == 0:
-		GamePtr.TravelerPtr.Rot.XZ += 1 // degree
-		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
-		// DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DY(angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeyUp && mods == 0:
-		GamePtr.TravelerPtr.Rot.YZ -= 1 // degree
-		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
-		// DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DX(angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeyDown && mods == 0:
-		GamePtr.TravelerPtr.Rot.YZ += 1 // degree
-		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
-		// DataShaderPtr.UniPtr.ViewUni = mgl32.HomogRotate3DX(-angle).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeySpace:
-		GamePtr.TravelerPtr.Rot.YZ = 0 // degree
-		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
+		case key == glfw.KeyDown && mods == 0:
+			g.SetAction(g.ActionRotDown)
 
-		/* move model*/
-		/*
-			case key == glfw.KeyRight && mods == glfw.ModControl|glfw.ModShift:
-				DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
-			case key == glfw.KeyLeft && mods == glfw.ModControl|glfw.ModShift:
-				DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(-step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
-			case key == glfw.KeyUp && mods == glfw.ModControl|glfw.ModShift:
-				DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
-			case key == glfw.KeyDown && mods == glfw.ModControl|glfw.ModShift:
-				DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, -step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
-			case key == glfw.KeyF && mods == glfw.ModControl|glfw.ModShift:
-				DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, step).Mul4(DataShaderPtr.UniPtr.ViewUni)
-			case key == glfw.KeyB && mods == glfw.ModControl|glfw.ModShift:
-				DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, -step).Mul4(DataShaderPtr.UniPtr.ViewUni)
-		*/
-		/* move view*/
-	case key == glfw.KeyRight && mods == glfw.ModShift:
-		GamePtr.TravelerPtr.Move(1, 0, 0)
-		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
-		// DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(-step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeyLeft && mods == glfw.ModShift:
-		GamePtr.TravelerPtr.Move(-1, 0, 0)
-		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
-		// DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(step, 0, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeyUp && mods == glfw.ModShift:
-		GamePtr.TravelerPtr.Move(0, 1, 0)
-		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
-		// DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, -step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeyDown && mods == glfw.ModShift:
-		GamePtr.TravelerPtr.Move(0, -1, 0)
-		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
-		// DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, step, 0).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeyF && mods == glfw.ModShift:
-		fallthrough
-	case key == glfw.KeyF && mods == 0:
-		GamePtr.TravelerPtr.Move(0, 0, 1)
-		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
-		// DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, -step).Mul4(DataShaderPtr.UniPtr.ViewUni)
-	case key == glfw.KeyB && mods == glfw.ModShift:
-		fallthrough
-	case key == glfw.KeyB && mods == 0:
-		GamePtr.TravelerPtr.Move(0, 0, -1)
-		GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
-		// DataShaderPtr.UniPtr.ViewUni = mgl32.Translate3D(0, 0, step).Mul4(DataShaderPtr.UniPtr.ViewUni)
+		case key == glfw.KeySpace:
+			g.SetAction(g.ActionLevel)
 
-		/* light */
-	case key == glfw.KeyL && mods == 0:
-		DataShaderPtr.UniPtr.LightUni = DataShaderPtr.UniPtr.ViewUni.Mat3().Inv().Mul3x1(mgl32.Vec3{0, 0, 1}).Normalize()
+			/* move player */
+		case key == glfw.KeyRight && mods == glfw.ModShift:
+			g.SetAction(g.ActionMoveRight)
 
-	case key == glfw.KeyZ && mods == 0: /* zoom out */
-		width, height := w.GetSize()
-		zy := DataShaderPtr.Mki3dPtr.Projection.ZoomY / 1.1
-		fmt.Println("ZoomY: ", zy)
-		DataShaderPtr.Mki3dPtr.Projection.ZoomY = zy
-		DataShaderPtr.UniPtr.SetProjectionFromMki3d(DataShaderPtr.Mki3dPtr, width, height)
-	case key == glfw.KeyZ && mods == glfw.ModShift: /* zoom in */
-		width, height := w.GetSize()
-		zy := DataShaderPtr.Mki3dPtr.Projection.ZoomY * 1.1
-		fmt.Println("ZoomY: ", zy)
-		DataShaderPtr.Mki3dPtr.Projection.ZoomY = zy
-		DataShaderPtr.UniPtr.SetProjectionFromMki3d(DataShaderPtr.Mki3dPtr, width, height)
-		/* help */
-	case key == glfw.KeyH && mods == 0:
-		message(helpText)
-		/*
-			doInMainThread = func() {
-				message( helpText )
-			}
-		*/
+		case key == glfw.KeyLeft && mods == glfw.ModShift:
+			g.SetAction(g.ActionMoveLeft)
+
+		case key == glfw.KeyUp && mods == glfw.ModShift:
+			g.SetAction(g.ActionMoveUp)
+
+		case key == glfw.KeyDown && mods == glfw.ModShift:
+			g.SetAction(g.ActionMoveDown)
+
+		case key == glfw.KeyF && mods == glfw.ModShift:
+			fallthrough
+		case key == glfw.KeyF && mods == 0, key == glfw.KeyEnter:
+			g.SetAction(g.ActionMoveForward)
+
+		case key == glfw.KeyB && mods == glfw.ModShift:
+			fallthrough
+		case key == glfw.KeyB && mods == 0, key == glfw.KeyBackspace:
+			g.SetAction(g.ActionMoveBackward)
+
+		case key == glfw.KeyL && mods == 0: /* light */
+			DataShaderPtr.UniPtr.LightUni = DataShaderPtr.UniPtr.ViewUni.Mat3().Inv().Mul3x1(mgl32.Vec3{0, 0, 1}).Normalize()
+
+		case key == glfw.KeyZ && mods == 0: /* zoom out */
+			width, height := w.GetSize()
+			zy := DataShaderPtr.Mki3dPtr.Projection.ZoomY / 1.1
+			fmt.Println("ZoomY: ", zy)
+			DataShaderPtr.Mki3dPtr.Projection.ZoomY = zy
+			DataShaderPtr.UniPtr.SetProjectionFromMki3d(DataShaderPtr.Mki3dPtr, width, height)
+		case key == glfw.KeyZ && mods == glfw.ModShift: /* zoom in */
+			width, height := w.GetSize()
+			zy := DataShaderPtr.Mki3dPtr.Projection.ZoomY * 1.1
+			fmt.Println("ZoomY: ", zy)
+			DataShaderPtr.Mki3dPtr.Projection.ZoomY = zy
+			DataShaderPtr.UniPtr.SetProjectionFromMki3d(DataShaderPtr.Mki3dPtr, width, height)
+			/* help */
+		case key == glfw.KeyH && mods == 0:
+			message(helpText)
+		}
 	}
 }
