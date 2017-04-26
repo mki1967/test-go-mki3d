@@ -37,6 +37,22 @@ type RotHVType struct {
 	YZ float64
 }
 
+// Rotate XZ by angle (in degrees)
+func (rot *RotHVType) RotateXZ(angle float64) {
+	rot.XZ = math.Remainder(rot.XZ+angle, 360)
+}
+
+// Rotate YZ by angle (in degrees) an clamping result to [-90,90]
+func (rot *RotHVType) RotateYZ(angle float64) {
+	rot.YZ = math.Remainder(rot.YZ+angle, 360)
+	if rot.YZ < -90 {
+		rot.YZ = -90
+	}
+	if rot.YZ > 90 {
+		rot.YZ = 90
+	}
+}
+
 const degToRadians = math.Pi / 180
 
 func (rot *RotHVType) WorldRotatedVector(vector mgl32.Vec3) mgl32.Vec3 {

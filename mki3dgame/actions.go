@@ -34,15 +34,30 @@ func (g *Mki3dGame) InitActionSectors() {
 		g.ActionMoveRight()
 	}
 
-	nl := func() {
+	rl := func() {
+		g.ActionRotLeft()
+	}
+	rr := func() {
+		g.ActionRotRight()
+	}
+
+	ru := func() {
+		g.ActionRotUp()
+	}
+	rd := func() {
+		g.ActionRotDown()
+	}
+
+	lv := func() {
+		g.ActionLevel()
 	}
 
 	g.ActionSectors = [6][6]func(){
 		{mf, mf, mu, mu, mf, mf},
-		{mf, mf, nl, nl, mf, mf},
-		{ml, nl, nl, nl, nl, mr},
-		{ml, nl, nl, nl, nl, mr},
-		{mb, mb, nl, nl, mb, mb},
+		{mf, mf, ru, ru, mf, mf},
+		{ml, rl, lv, lv, rr, mr},
+		{ml, rl, lv, lv, rr, mr},
+		{mb, mb, rd, rd, mb, mb},
 		{mb, mb, md, md, mb, mb},
 	}
 
@@ -97,4 +112,28 @@ func (g *Mki3dGame) ActionMoveDown() {
 	d := float32(g.TravelerPtr.MovSpeed * g.LastTimeDelta)
 	g.TravelerPtr.Move(0, -d, 0)
 	g.TravelerPtr.ClipToBox(g.VMin, g.VMax)
+}
+
+func (g *Mki3dGame) ActionRotLeft() {
+	d := g.TravelerPtr.RotSpeed * g.LastTimeDelta
+	g.TravelerPtr.Rot.RotateXZ(d)
+}
+
+func (g *Mki3dGame) ActionRotRight() {
+	d := g.TravelerPtr.RotSpeed * g.LastTimeDelta
+	g.TravelerPtr.Rot.RotateXZ(-d)
+}
+
+func (g *Mki3dGame) ActionRotUp() {
+	d := g.TravelerPtr.RotSpeed * g.LastTimeDelta
+	g.TravelerPtr.Rot.RotateYZ(-d)
+}
+
+func (g *Mki3dGame) ActionRotDown() {
+	d := g.TravelerPtr.RotSpeed * g.LastTimeDelta
+	g.TravelerPtr.Rot.RotateYZ(d)
+}
+
+func (g *Mki3dGame) ActionLevel() {
+	g.TravelerPtr.Rot.YZ = 0
 }

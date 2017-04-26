@@ -12,7 +12,7 @@ import (
 	// "math/rand"
 )
 
-const TravelerMovSpeed = 10 // units per second
+const TravelerMovSpeed = 15 // units per second
 const TravelerRotSpeed = 90 // degrees per second
 
 type Traveler struct {
