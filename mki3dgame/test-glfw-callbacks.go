@@ -12,8 +12,10 @@ import (
 
 // Function to be used as resize callback
 func SizeCallback(w *glfw.Window, width int, height int) {
-	gl.Viewport(0, 0, int32(width), int32(height))                                                                 // inform GL about resize
-	DataShaderPtr.UniPtr.ProjectionUni = tmki3d.ProjectionMatrix(DataShaderPtr.Mki3dPtr.Projection, width, height) // recompute projection matrix
+	g := GamePtr                                                                                                 // short name
+	gl.Viewport(0, 0, int32(width), int32(height))                                                               // inform GL about resize
+	g.StageDSPtr.UniPtr.ProjectionUni = tmki3d.ProjectionMatrix(g.StageDSPtr.Mki3dPtr.Projection, width, height) // recompute projection matrix
+	// fmt.Println("SizeCallback ",  width, " ", height)
 }
 
 func KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
@@ -68,20 +70,21 @@ func KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action,
 			g.SetAction(g.ActionMoveBackward)
 
 		case key == glfw.KeyL && mods == 0: /* light */
-			DataShaderPtr.UniPtr.LightUni = DataShaderPtr.UniPtr.ViewUni.Mat3().Inv().Mul3x1(mgl32.Vec3{0, 0, 1}).Normalize()
+			g.StageDSPtr.UniPtr.LightUni = g.StageDSPtr.UniPtr.ViewUni.Mat3().Inv().Mul3x1(mgl32.Vec3{0, 0, 1}).Normalize()
 
 		case key == glfw.KeyZ && mods == 0: /* zoom out */
 			width, height := w.GetSize()
-			zy := DataShaderPtr.Mki3dPtr.Projection.ZoomY / 1.1
+			zy := g.StageDSPtr.Mki3dPtr.Projection.ZoomY / 1.1
 			fmt.Println("ZoomY: ", zy)
-			DataShaderPtr.Mki3dPtr.Projection.ZoomY = zy
-			DataShaderPtr.UniPtr.SetProjectionFromMki3d(DataShaderPtr.Mki3dPtr, width, height)
+			g.StageDSPtr.Mki3dPtr.Projection.ZoomY = zy
+			g.StageDSPtr.UniPtr.SetProjectionFromMki3d(g.StageDSPtr.Mki3dPtr, width, height)
 		case key == glfw.KeyZ && mods == glfw.ModShift: /* zoom in */
 			width, height := w.GetSize()
-			zy := DataShaderPtr.Mki3dPtr.Projection.ZoomY * 1.1
+			zy := g.StageDSPtr.Mki3dPtr.Projection.ZoomY * 1.1
 			fmt.Println("ZoomY: ", zy)
-			DataShaderPtr.Mki3dPtr.Projection.ZoomY = zy
-			DataShaderPtr.UniPtr.SetProjectionFromMki3d(DataShaderPtr.Mki3dPtr, width, height)
+			g.StageDSPtr.Mki3dPtr.Projection.ZoomY = zy
+			g.StageDSPtr.UniPtr.SetProjectionFromMki3d(g.StageDSPtr.Mki3dPtr, width, height)
+
 			/* help */
 		case key == glfw.KeyH && mods == 0:
 			message(helpText)

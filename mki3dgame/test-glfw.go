@@ -9,7 +9,7 @@ import (
 	"github.com/go-gl/glfw/v3.2/glfw"
 	// "github.com/mki1967/go-mki3d/mki3d"
 	// "github.com/go-gl/mathgl/mgl32"
-	"github.com/mki1967/test-go-mki3d/tmki3d"
+	// "github.com/mki1967/test-go-mki3d/tmki3d"
 	"log"
 	"math/rand"
 	"os"
@@ -26,8 +26,7 @@ func init() {
 const windowWidth = 800
 const windowHeight = 600
 
-var DataShaderPtr *tmki3d.DataShader // global variable in the main package
-var GamePtr *Mki3dGame               // global variable in the main package
+var GamePtr *Mki3dGame // global variable in the main package
 
 var Window *glfw.Window // main window
 
@@ -110,10 +109,7 @@ func main() {
 	}
 
 	GamePtr = game
-	// DataShaderPtr = mki3dDataShaderPtr // set the global variable
-	DataShaderPtr = game.StageDSPtr // set the global variable
-
-	// setting callbacks
+	// setting callbacks for GamePtr
 	window.SetSizeCallback(SizeCallback)
 	window.SetKeyCallback(KeyCallback)
 	window.SetMouseButtonCallback(Mki3dMouseButtonCallback)
