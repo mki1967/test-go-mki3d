@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "fmt" // tests
+	"fmt" // tests
 	// "errors"
 	// "github.com/go-gl/gl/v3.3-core/gl"
 	// "github.com/go-gl/glfw/v3.2/glfw"
@@ -43,10 +43,17 @@ const TokenCollectionSqrDist = 1
 
 // Update token t in game g
 func (t *TokenType) Update(g *Mki3dGame) {
+	if t.Collected {
+		return // should not be considered
+	}
 	v := t.Position.Sub(g.TravelerPtr.Position)
 	if v.Dot(v) < TokenCollectionSqrDist {
 		t.Collected = true
 		g.TokensRemaining--
+		g.TokensCollected++
+		g.CancelAction()
 		// some celebrations ...
+		fmt.Println("COLLECTED !!! (", g.TokensRemaining, " remaining)")
+
 	}
 }

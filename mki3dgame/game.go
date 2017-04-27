@@ -1,14 +1,14 @@
 package main
 
 import (
-	// "fmt" // tests
+	"fmt" // tests
 	// "errors"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/go-mki3d/mki3d"
 	"github.com/mki1967/test-go-mki3d/tmki3d"
-	// "math"
+	"math"
 	// "math/rand"
 )
 
@@ -16,7 +16,7 @@ const BoxMargin = 30 // margin for bounding box of the stage
 
 var FrameColor = mki3d.Vector3dType{1.0, 1.0, 1.0} // color of the bounding box frame
 
-var NumberOfMonsters = 6
+var NumberOfMonsters = 8
 
 var NumberOfTokens = 10
 
@@ -27,6 +27,8 @@ const HorizontalSectors = 6 // horizontal  dimmension of sectors array
 type Mki3dGame struct {
 	// assets info
 	AssetsPtr *Assets
+	// GLFW data
+	WindowPtr *glfw.Window
 	// GL shaders
 	ShaderPtr *tmki3d.Shader
 	// Shape data shaders
@@ -44,10 +46,13 @@ type Mki3dGame struct {
 
 	Tokens []*TokenType // set of tokens
 
-	TokensRemaining int // number of remaining tokens
+	TokensRemaining int     // number of remaining tokens
+	TokensCollected int     // number of remaining tokens
+	TotalScore      float64 // number of remaining tokens
 
-	LastProbedTime float64 // game global time probing
-	LastTimeDelta  float64 // game global time probing
+	StageStartingTime float64 // game global time probing
+	LastProbedTime    float64 // game global time probing
+	LastTimeDelta     float64 // game global time probing
 
 	CurrentAction func()                                     // current action of the player
 	ActionSectors [VerticalSectors][HorizontalSectors]func() // functions of the mouse actions
@@ -56,8 +61,10 @@ type Mki3dGame struct {
 // Make game structure with the shader and without any data.
 // Prepare assets info using pathToAssets.
 // Return pointer to the strucure.
-func MakeEmptyGame(pathToAssets string) (*Mki3dGame, error) {
+func MakeEmptyGame(pathToAssets string, window *glfw.Window) (*Mki3dGame, error) {
 	var game Mki3dGame
+
+	game.WindowPtr = window
 
 	shaderPtr, err := tmki3d.MakeShader()
 	if err != nil {
@@ -78,7 +85,10 @@ func MakeEmptyGame(pathToAssets string) (*Mki3dGame, error) {
 }
 
 // Load data and init game for the first stage
-func (game *Mki3dGame) Init(width, height int) (err error) {
+func (game *Mki3dGame) Init() (err error) {
+
+	width, height := game.WindowPtr.GetSize()
+
 	err = game.InitSectors()
 	if err != nil {
 		return err
@@ -99,8 +109,10 @@ func (game *Mki3dGame) Init(width, height int) (err error) {
 		return err
 	}
 
+	fmt.Println("NEW STAGE! Collect ", game.TokensRemaining, " tokens.")
 	// init time probe
 	game.LastProbedTime = glfw.GetTime()
+	game.StageStartingTime = game.LastProbedTime
 	game.LastTimeDelta = 0
 
 	return nil
@@ -367,6 +379,23 @@ func (game *Mki3dGame) copmuteFrame() {
 func (game *Mki3dGame) Update() {
 	game.UpdateMonsters()
 	game.UpdateTokens()
+	// check the state
+	if game.TokensRemaining <= 0 {
+		// compute some results ...
+		time := math.Floor(game.LastProbedTime - game.StageStartingTime)
+		score := math.Floor(1 + 30*float64(game.TokensCollected)/(time+1))
+		game.TotalScore += score
+		fmt.Println("STAGE FINISHED !!! Time:", time, " seconds, stage score: ", score, ", total: ", game.TotalScore, ".")
+		game.NextStage()
+	}
+}
+
+func (game *Mki3dGame) NextStage() {
+	// block callbacks ... ?
+	// reload next stage
+	game.TokensCollected = 0
+	game.Init()
+	// unblock callbacks ... ?
 }
 
 // Redraw the game stage

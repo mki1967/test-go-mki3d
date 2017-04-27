@@ -94,14 +94,17 @@ func main() {
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0.0, 0.0, 0.3, 1.0)
 
-	// Get current width and height of the window for MakeDataShader
-	width, height := window.GetSize()
+	// message(helpText) // initial help message
+	fmt.Println(helpText)
 
-	game, err := MakeEmptyGame(os.Args[1])
+	// init game structure from assets and the game window
+	game, err := MakeEmptyGame(os.Args[1], window)
 	if err != nil {
 		panic(err)
 	}
-	err = game.Init(width, height)
+
+	// load the first stage
+	err = game.Init()
 	if err != nil {
 		panic(err)
 	}
@@ -114,7 +117,6 @@ func main() {
 	window.SetSizeCallback(SizeCallback)
 	window.SetKeyCallback(KeyCallback)
 	window.SetMouseButtonCallback(Mki3dMouseButtonCallback)
-	message(helpText) // initial help message
 
 	// main loop
 	for !window.ShouldClose() {
@@ -137,6 +139,7 @@ func main() {
 		glfw.PollEvents()
 	}
 
+	fmt.Println("YOUR TOTAL SCORE IS: ", game.TotalScore)
 	// cleanup
 	game.StageDSPtr.DeleteData()
 	game.FrameDSPtr.DeleteData()
