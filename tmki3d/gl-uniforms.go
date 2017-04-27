@@ -16,7 +16,7 @@ type GLUni struct {
 }
 
 // SetSimple  sets GLUni for simple drawing directly in clipping space
-// (i.e. rectangular projection on XY plane in the cube [-1,1]^3 resized to the window)
+// (i.e. orthogonal projection projection on the XY plane in the cube [-1,1]^3 resized to the window)
 func (glUni *GLUni) SetSimple() {
 	glUni.ProjectionUni = mgl32.Ident4()
 	glUni.ViewUni = mgl32.Ident4()
