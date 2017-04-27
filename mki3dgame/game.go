@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt" // tests
+	// "fmt" // tests
 	// "errors"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
@@ -304,7 +304,6 @@ func (game *Mki3dGame) copmuteVMinVMax() {
 
 	game.VMin = game.VMin.Sub(m)
 	game.VMax = game.VMax.Add(m)
-	fmt.Println(game.VMin, game.VMax) // test
 }
 
 // recompute frame of the bounding box corners of the stage.

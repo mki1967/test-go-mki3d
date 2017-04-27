@@ -1,11 +1,6 @@
 package main
 
 const helpText = `
-HELP MESSAGE:
-=============
-
-This program should be run as a foreground proces in the termnal.
-
 Key press actions:
 ------------------
 
@@ -13,7 +8,24 @@ Key press actions:
   Arrow keys - rotate observer
   Shift + Arrow keys  - move observer sideways
   B, F - move observer backward or forward
-  Ctrl + Arrow keys - rotate object
-  Ctrl + Shift + Arrow keys or B,F - move the object
   L - set the diffuse light directiorn perpendicular to the screen
+
+Sectors action layout:
+----------------------
++---------+---------+---------+
+| MF      |   MU    | MF      |
+|         +---------+         |
+|         |   RU    |         |
++---------+---------+---------+
+|    |    |         |    |    |
+| ML | RL |   LV    | RR | MR |
+|    |    |         |    |    |
++---------+---------+---------+
+|         |   RD    |         |
+|         +---------+         |
+| MB      |   MD    | MB      |
++---------+---------+---------+
+
+MF, MB, MU, MD, ML, MR - move forward, backward, up, down, left and right
+RU, RD, RL, RR - rotate up, down, left and right
 `

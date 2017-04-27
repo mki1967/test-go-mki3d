@@ -94,22 +94,6 @@ func main() {
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0.0, 0.0, 0.3, 1.0)
 
-	// callbacks
-
-	// Create both (segment and triangle) shaders in single structure
-	mki3dShaderPtr, err := tmki3d.MakeShader()
-	if err != nil {
-		panic(err)
-	}
-
-	// trying to load assets
-	fmt.Println("Trying to read assets from ", os.Args[1])
-
-	assetsPtr, err := LoadAssets(os.Args[1])
-	if err != nil {
-		panic(err)
-	}
-
 	// Get current width and height of the window for MakeDataShader
 	width, height := window.GetSize()
 
@@ -125,14 +109,6 @@ func main() {
 	GamePtr = game
 	// DataShaderPtr = mki3dDataShaderPtr // set the global variable
 	DataShaderPtr = game.StageDSPtr // set the global variable
-
-	tokenPtr, err := assetsPtr.LoadRandomToken()
-	tokenDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, tokenPtr)
-
-	sectorsPtr, err := assetsPtr.LoadRandomSectors()
-	sectorsDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, sectorsPtr)
-
-	sectorsDataShaderPtr.UniPtr.SetSimple()
 
 	// setting callbacks
 	window.SetSizeCallback(SizeCallback)
@@ -163,6 +139,9 @@ func main() {
 
 	// cleanup
 	game.StageDSPtr.DeleteData()
-	sectorsDataShaderPtr.DeleteData()
-	tokenDataShaderPtr.DeleteData()
+	game.FrameDSPtr.DeleteData()
+	game.SectorsDSPtr.DeleteData()
+	game.TokenDSPtr.DeleteData()
+	game.MonsterDSPtr.DeleteData()
+
 }

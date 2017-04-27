@@ -25,6 +25,7 @@ const (
 	TokensDir   = "tokens"
 	SectorsDir  = "sectors"
 	MonstersDir = "monsters"
+	IconsDir    = "icons"
 	PS          = string(os.PathSeparator)
 )
 
@@ -68,7 +69,14 @@ func LoadAssets(pathToAssets string) (*Assets, error) {
 		return &assets, err
 	}
 
-	// fmt.Printf("%+v\n", assets) // tests
+	assets.Icons, err = ioutil.ReadDir(pathToAssets +
+		PS +
+		IconsDir)
+
+	if err != nil {
+		return &assets, err
+	}
+
 	return &assets, nil
 }
 
