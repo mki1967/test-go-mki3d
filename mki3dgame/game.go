@@ -10,13 +10,14 @@ import (
 	"github.com/mki1967/test-go-mki3d/tmki3d"
 	"math"
 	// "math/rand"
+	_ "image/png"
 )
 
 const BoxMargin = 30 // margin for bounding box of the stage
 
 var FrameColor = mki3d.Vector3dType{1.0, 1.0, 1.0} // color of the bounding box frame
 
-var NumberOfMonsters = 8
+var NumberOfMonsters = 10
 
 var NumberOfTokens = 10
 
@@ -81,6 +82,14 @@ func MakeEmptyGame(pathToAssets string, window *glfw.Window) (*Mki3dGame, error)
 	game.AssetsPtr = assetsPtr
 
 	game.InitActionSectors()
+
+	// set icons
+	imgs, err := assetsPtr.LoadIcons()
+	if err != nil {
+		return nil, err
+	}
+
+	window.SetIcon(imgs)
 
 	// setting the callbacks
 	window.SetSizeCallback(game.SizeCallback)

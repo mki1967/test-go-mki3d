@@ -1,10 +1,12 @@
 package main
 
 import (
-	// "fmt" // tests
+	"fmt" // tests
 	"io/ioutil"
 	// "errors"
 	"github.com/mki1967/go-mki3d/mki3d"
+	"image"
+	_ "image/png"
 	"math/rand"
 	"os"
 )
@@ -90,6 +92,24 @@ func (a *Assets) load(dir string, fname string) (*mki3d.Mki3dType, error) {
 		return nil, err
 	}
 	return mki3dPtr, err
+}
+
+func (a *Assets) LoadIcons() ([]image.Image, error) {
+	img := make([]image.Image, len(a.Icons))
+	for i, f := range a.Icons {
+		name := a.Path + PS + IconsDir + PS + f.Name()
+		imgFile, err := os.Open(name)
+		if err != nil {
+			return nil, err
+		}
+		img[i], _, err = image.Decode(imgFile)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println("Loaded: ", name) // test
+
+	}
+	return img, nil
 }
 
 func (a *Assets) LoadRandomStage() (*mki3d.Mki3dType, error) {
