@@ -10,17 +10,17 @@ import (
 	// "github.com/mki1967/test-go-mki3d/tmki3d"
 )
 
-func KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
+func (g *Mki3dGame) KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
 	if action == glfw.Release {
 		if action == glfw.Release {
-			GamePtr.CancelAction()
+			g.CancelAction()
 			return
 		}
 
 	}
 
 	if action == glfw.Press {
-		g := GamePtr // short name
+		// g := GamePtr // short name
 		switch {
 
 		/* rotate player */

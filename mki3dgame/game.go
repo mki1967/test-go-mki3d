@@ -61,6 +61,7 @@ type Mki3dGame struct {
 // Make game structure with the shader and without any data.
 // Prepare assets info using pathToAssets.
 // Return pointer to the strucure.
+// To be used once (before the game).
 func MakeEmptyGame(pathToAssets string, window *glfw.Window) (*Mki3dGame, error) {
 	var game Mki3dGame
 
@@ -80,11 +81,17 @@ func MakeEmptyGame(pathToAssets string, window *glfw.Window) (*Mki3dGame, error)
 	game.AssetsPtr = assetsPtr
 
 	game.InitActionSectors()
+
+	// setting the callbacks
+	window.SetSizeCallback(game.SizeCallback)
+	window.SetKeyCallback(game.KeyCallback)
+	window.SetMouseButtonCallback(game.Mki3dMouseButtonCallback)
+
 	return &game, nil
 
 }
 
-// Load data and init game for the first stage
+// Load data and init game for each new stage.
 func (game *Mki3dGame) Init() (err error) {
 
 	width, height := game.WindowPtr.GetSize()
@@ -380,13 +387,19 @@ func (game *Mki3dGame) Update() {
 	game.UpdateMonsters()
 	game.UpdateTokens()
 	// check the state
-	if game.TokensRemaining <= 0 {
+	if game.TokensRemaining <= 0 { // go to next stage
 		// compute some results ...
 		time := math.Floor(game.LastProbedTime - game.StageStartingTime)
 		score := math.Floor(1 + 30*float64(game.TokensCollected)/(time+1))
 		game.TotalScore += score
 		fmt.Println("STAGE FINISHED !!! Time:", time, " seconds, stage score: ", score, ", total: ", game.TotalScore, ".")
 		game.NextStage()
+	} else { // update the player in the stage
+		if game.CurrentAction != nil {
+			game.CurrentAction()
+			game.StageDSPtr.UniPtr.ViewUni = game.TravelerPtr.ViewMatrix()
+		}
+
 	}
 }
 

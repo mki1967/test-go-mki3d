@@ -26,8 +26,6 @@ func init() {
 const windowWidth = 800
 const windowHeight = 600
 
-var GamePtr *Mki3dGame // global variable in the main package
-
 var Window *glfw.Window // main window
 
 func message(msg string) error {
@@ -52,12 +50,10 @@ var doInMainThread func() = nil
 
 func main() {
 
-	// get file name from command line argument
+	// get path to assets from command line argument
 	if len(os.Args) < 2 {
 		panic(errors.New(" *** PROVIDE PATH TO ASSETS DIRECTORY AS A COMMAND LINE ARGUMENT !!! *** "))
 	}
-
-	// fmt.Printf("%v\n", mki3d.Stringify(mki3dPtr)) // for tests ...
 
 	// fragments from https://github.com/go-gl/examples/blob/master/gl41core-cube/cube.go
 
@@ -108,21 +104,11 @@ func main() {
 		panic(err)
 	}
 
-	GamePtr = game
-	// setting callbacks for GamePtr
-	window.SetSizeCallback(SizeCallback)
-	window.SetKeyCallback(KeyCallback)
-	window.SetMouseButtonCallback(Mki3dMouseButtonCallback)
-
 	// main loop
 	for !window.ShouldClose() {
 
 		game.ProbeTime()
 		game.Update()
-		if game.CurrentAction != nil {
-			game.CurrentAction()
-			GamePtr.StageDSPtr.UniPtr.ViewUni = GamePtr.TravelerPtr.ViewMatrix()
-		}
 		game.Redraw()
 
 		// Maintenance

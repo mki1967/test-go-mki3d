@@ -10,9 +10,9 @@ import (
 	// "github.com/mki1967/test-go-mki3d/tmki3d"
 )
 
-func Mki3dMouseButtonCallback(w *glfw.Window, button glfw.MouseButton, action glfw.Action, mod glfw.ModifierKey) {
+func (g *Mki3dGame) Mki3dMouseButtonCallback(w *glfw.Window, button glfw.MouseButton, action glfw.Action, mod glfw.ModifierKey) {
 	if action == glfw.Release {
-		GamePtr.CancelAction()
+		g.CancelAction()
 		return
 	}
 
@@ -21,7 +21,7 @@ func Mki3dMouseButtonCallback(w *glfw.Window, button glfw.MouseButton, action gl
 		fx, fy := w.GetCursorPos()
 		x := int(fx)
 		y := int(fy)
-		GamePtr.SetSectorAction(x, y, width, height)
+		g.SetSectorAction(x, y, width, height)
 		return
 	}
 

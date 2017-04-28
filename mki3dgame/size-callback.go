@@ -11,10 +11,9 @@ import (
 )
 
 // Function to be used as resize callback
-func SizeCallback(w *glfw.Window, width int, height int) {
-	g := GamePtr                                                                                                 // short name
+func (g *Mki3dGame) SizeCallback(w *glfw.Window, width int, height int) {
+	// g := GamePtr                                                                                                 // short name
 	gl.Viewport(0, 0, int32(width), int32(height))                                                               // inform GL about resize
 	g.StageDSPtr.UniPtr.ProjectionUni = tmki3d.ProjectionMatrix(g.StageDSPtr.Mki3dPtr.Projection, width, height) // recompute projection matrix
 	// fmt.Println("SizeCallback ",  width, " ", height)
 }
-
