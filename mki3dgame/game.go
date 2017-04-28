@@ -386,6 +386,7 @@ func (game *Mki3dGame) copmuteFrame() {
 func (game *Mki3dGame) Update() {
 	game.UpdateMonsters()
 	game.UpdateTokens()
+	game.TravelerPtr.Update(game) // Captured ?
 	// check the state
 	if game.TokensRemaining <= 0 { // go to next stage
 		// compute some results ...

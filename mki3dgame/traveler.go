@@ -16,10 +16,11 @@ const TravelerMovSpeed = 15 // units per second
 const TravelerRotSpeed = 90 // degrees per second
 
 type Traveler struct {
-	Position mgl32.Vec3 // position
-	Rot      RotHVType  // orientation
-	MovSpeed float64
-	RotSpeed float64
+	Position   mgl32.Vec3 // position
+	Rot        RotHVType  // orientation
+	MovSpeed   float64
+	RotSpeed   float64
+	CapturedBy *MonsterType
 }
 
 func (t *Traveler) ViewMatrix() mgl32.Mat4 {
@@ -77,4 +78,11 @@ func MakeTraveler(position mgl32.Vec3) *Traveler {
 	t.MovSpeed = TravelerMovSpeed
 	t.RotSpeed = TravelerRotSpeed
 	return &t
+}
+
+func (t *Traveler) Update(g *Mki3dGame) {
+	if t.CapturedBy != nil {
+		t.Position = t.CapturedBy.Position
+		g.StageDSPtr.UniPtr.ViewUni = g.TravelerPtr.ViewMatrix()
+	}
 }

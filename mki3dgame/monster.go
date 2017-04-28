@@ -1,7 +1,7 @@
 package main
 
 import (
-	//"fmt" // tests
+	"fmt" // tests
 	// "errors"
 	// "github.com/go-gl/gl/v3.3-core/gl"
 	// "github.com/go-gl/glfw/v3.2/glfw"
@@ -13,6 +13,8 @@ import (
 )
 
 var MonsterSpeed float32 = 10
+
+const MonsterCaptureRangeSqr = 2 // Square of the monster's capture range
 
 // Parameters of a single monster
 type MonsterType struct {
@@ -66,4 +68,17 @@ func (m *MonsterType) Update(g *Mki3dGame) {
 	if m.Position[2] <= g.VMin[2] {
 		m.Speed[2] = float32(math.Abs(float64(m.Speed[2])))
 	}
+
+	// try to capture the traveler
+
+	t := g.TravelerPtr // short name for traveler
+	if t.CapturedBy == nil {
+		v := t.Position.Sub(m.Position)
+		if v.Dot(v) < MonsterCaptureRangeSqr {
+			t.CapturedBy = m
+			fmt.Println("YOU HAVE BEEN CAPTURED BY A MONSTER !!!")
+		}
+
+	}
+
 }
