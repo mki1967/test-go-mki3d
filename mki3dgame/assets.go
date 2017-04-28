@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt" // tests
+	// "fmt" // tests
 	"io/ioutil"
 	// "errors"
 	"github.com/mki1967/go-mki3d/mki3d"
@@ -106,7 +106,7 @@ func (a *Assets) LoadIcons() ([]image.Image, error) {
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println("Loaded: ", name) // test
+		// fmt.Println("Loaded: ", name) // test
 
 	}
 	return img, nil
