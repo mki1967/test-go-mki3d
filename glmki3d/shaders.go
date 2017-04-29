@@ -1,4 +1,4 @@
-package tmki3d
+package glmki3d
 
 import (
 	"fmt"

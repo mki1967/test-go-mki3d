@@ -1,4 +1,4 @@
-package tmki3d
+package glmki3d
 
 import (
 	"github.com/go-gl/gl/v3.3-core/gl"

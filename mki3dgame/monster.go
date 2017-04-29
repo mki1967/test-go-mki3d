@@ -7,7 +7,7 @@ import (
 	// "github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 	// "github.com/mki1967/go-mki3d/mki3d"
-	"github.com/mki1967/test-go-mki3d/tmki3d"
+	"github.com/mki1967/test-go-mki3d/glmki3d"
 	"math"
 	// "math/rand"
 )
@@ -18,14 +18,14 @@ const MonsterCaptureRangeSqr = 2 // Square of the monster's capture range
 
 // Parameters of a single monster
 type MonsterType struct {
-	Position mgl32.Vec3         // current position
-	Speed    mgl32.Vec3         // speed vector
-	DSPtr    *tmki3d.DataShader // shape for redraw (may be shared by many)
+	Position mgl32.Vec3          // current position
+	Speed    mgl32.Vec3          // speed vector
+	DSPtr    *glmki3d.DataShader // shape for redraw (may be shared by many)
 	// time     float64            // last update time
 }
 
 // Creates a monster wth random speed direction at position pos with datashader *dsptr
-func MakeMonster(pos mgl32.Vec3, dsPtr *tmki3d.DataShader) *MonsterType {
+func MakeMonster(pos mgl32.Vec3, dsPtr *glmki3d.DataShader) *MonsterType {
 	var m MonsterType
 	m.Position = pos
 	m.DSPtr = dsPtr

@@ -7,7 +7,7 @@ import (
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/go-mki3d/mki3d"
-	"github.com/mki1967/test-go-mki3d/tmki3d"
+	"github.com/mki1967/test-go-mki3d/glmki3d"
 	"math"
 	// "math/rand"
 	_ "image/png"
@@ -31,13 +31,13 @@ type Mki3dGame struct {
 	// GLFW data
 	WindowPtr *glfw.Window
 	// GL shaders
-	ShaderPtr *tmki3d.Shader
+	ShaderPtr *glmki3d.Shader
 	// Shape data shaders
-	StageDSPtr   *tmki3d.DataShader
-	FrameDSPtr   *tmki3d.DataShader // frame of the bounding box (computed for the stage)
-	SectorsDSPtr *tmki3d.DataShader
-	TokenDSPtr   *tmki3d.DataShader
-	MonsterDSPtr *tmki3d.DataShader
+	StageDSPtr   *glmki3d.DataShader
+	FrameDSPtr   *glmki3d.DataShader // frame of the bounding box (computed for the stage)
+	SectorsDSPtr *glmki3d.DataShader
+	TokenDSPtr   *glmki3d.DataShader
+	MonsterDSPtr *glmki3d.DataShader
 
 	VMin, VMax mgl32.Vec3 // corners of the bounding box of the stage (computed with the BoxMargin)
 
@@ -68,7 +68,7 @@ func MakeEmptyGame(pathToAssets string, window *glfw.Window) (*Mki3dGame, error)
 
 	game.WindowPtr = window
 
-	shaderPtr, err := tmki3d.MakeShader()
+	shaderPtr, err := glmki3d.MakeShader()
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (game *Mki3dGame) InitSectors() error {
 		return err
 	}
 
-	sectorsDataShaderPtr, err := tmki3d.MakeDataShader(game.ShaderPtr, sectorsPtr)
+	sectorsDataShaderPtr, err := glmki3d.MakeDataShader(game.ShaderPtr, sectorsPtr)
 	if err != nil {
 		return err
 	}
@@ -173,7 +173,7 @@ func (game *Mki3dGame) InitToken() error {
 		return err
 	}
 
-	tokenDataShaderPtr, err := tmki3d.MakeDataShader(game.ShaderPtr, tokenPtr)
+	tokenDataShaderPtr, err := glmki3d.MakeDataShader(game.ShaderPtr, tokenPtr)
 	if err != nil {
 		return err
 	}
@@ -218,7 +218,7 @@ func (game *Mki3dGame) InitMonster() error {
 		return err
 	}
 
-	monsterDataShaderPtr, err := tmki3d.MakeDataShader(game.ShaderPtr, monsterPtr)
+	monsterDataShaderPtr, err := glmki3d.MakeDataShader(game.ShaderPtr, monsterPtr)
 	if err != nil {
 		return err
 	}
@@ -266,7 +266,7 @@ func (game *Mki3dGame) InitStage(width, height int) error {
 		return err
 	}
 
-	stageDataShaderPtr, err := tmki3d.MakeDataShader(game.ShaderPtr, stagePtr)
+	stageDataShaderPtr, err := glmki3d.MakeDataShader(game.ShaderPtr, stagePtr)
 	if err != nil {
 		return err
 	}
@@ -376,7 +376,7 @@ func (game *Mki3dGame) copmuteFrame() {
 
 	frameMki3d.Model.Segments = segments
 
-	dsPtr, err := tmki3d.MakeDataShader(game.ShaderPtr, &frameMki3d)
+	dsPtr, err := glmki3d.MakeDataShader(game.ShaderPtr, &frameMki3d)
 
 	if err != nil {
 		panic(err)
