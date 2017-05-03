@@ -8,7 +8,7 @@ import (
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/mki1967/go-mki3d/mki3d"
-	"github.com/mki1967/test-go-mki3d/tmki3d"
+	"github.com/mki1967/test-go-mki3d/glmki3d"
 	"log"
 	"os"
 	"runtime"
@@ -23,7 +23,7 @@ func init() {
 const windowWidth = 800
 const windowHeight = 600
 
-var DataShaderPtr *tmki3d.DataShader // global variable in the main package
+var DataShaderPtr *glmki3d.DataShader // global variable in the main package
 
 var Window *glfw.Window // main window
 
@@ -39,7 +39,6 @@ func message(msg string) error {
 	if err != nil {
 		panic(err)
 	}
-	// err = Window.Maximize()
 	Window.Show()
 	fmt.Println("RESUMED.")
 	return err
@@ -56,11 +55,11 @@ func main() {
 	fmt.Println("Trying to read from ", os.Args[1])
 
 	// Load mki3d data from a file
-	// mki3dPtr, err := mki3d.ReadFile("noname.mki3d")
 	mki3dPtr, err := mki3d.ReadFile(os.Args[1])
 	if err != nil {
 		panic(err)
 	}
+
 	// fmt.Printf("%v\n", mki3d.Stringify(mki3dPtr)) // for tests ...
 
 	// fragments from https://github.com/go-gl/examples/blob/master/gl41core-cube/cube.go
@@ -97,22 +96,24 @@ func main() {
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(0.0, 0.0, 0.3, 1.0)
 
-	// callbacks
-
 	// Create both (segment and triangle) shaders in single structure
-	mki3dShaderPtr, err := tmki3d.MakeShader()
+	mki3dShaderPtr, err := glmki3d.MakeShader()
 	if err != nil {
 		panic(err)
 	}
 
-	// Get current width and height of the window for MakeDataShader
-	width, height := window.GetSize()
-	mki3dDataShaderPtr, err := tmki3d.MakeDataShader(mki3dShaderPtr, mki3dPtr, width, height)
+	mki3dDataShaderPtr, err := glmki3d.MakeDataShader(mki3dShaderPtr, mki3dPtr)
 	if err != nil {
 		panic(err)
 	}
 
 	DataShaderPtr = mki3dDataShaderPtr // set the global variable
+
+	// Get current width and height of the window
+	width, height := window.GetSize()
+	DataShaderPtr.UniPtr.SetProjectionFromMki3d(mki3dPtr, width, height)
+	DataShaderPtr.UniPtr.SetViewFromMki3d(mki3dPtr)
+	DataShaderPtr.UniPtr.SetLightFromMki3d(mki3dPtr)
 
 	// setting callbacks
 	window.SetSizeCallback(SizeCallback)
@@ -136,10 +137,6 @@ func main() {
 		// Maintenance
 		window.SwapBuffers()
 		glfw.WaitEvents()
-		if doInMainThread != nil {
-			doInMainThread()     // execute required function
-			doInMainThread = nil // done
-		}
 		// glfw.PollEvents()
 	}
 }

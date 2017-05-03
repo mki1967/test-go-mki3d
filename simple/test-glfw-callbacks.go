@@ -7,13 +7,13 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 	"math"
 	// "github.com/mki1967/go-mki3d/mki3d"
-	"github.com/mki1967/test-go-mki3d/tmki3d"
+	"github.com/mki1967/test-go-mki3d/glmki3d"
 )
 
 // Function to be used as resize callback
 func SizeCallback(w *glfw.Window, width int, height int) {
-	gl.Viewport(0, 0, int32(width), int32(height))                                                                 // inform GL about resize
-	DataShaderPtr.UniPtr.ProjectionUni = tmki3d.ProjectionMatrix(DataShaderPtr.Mki3dPtr.Projection, width, height) // recompute projection matrix
+	gl.Viewport(0, 0, int32(width), int32(height))                                                                  // inform GL about resize
+	DataShaderPtr.UniPtr.ProjectionUni = glmki3d.ProjectionMatrix(DataShaderPtr.Mki3dPtr.Projection, width, height) // recompute projection matrix
 }
 
 func KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
