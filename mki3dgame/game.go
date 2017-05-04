@@ -7,7 +7,7 @@ import (
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/mki1967/go-mki3d/mki3d"
-	"github.com/mki1967/test-go-mki3d/glmki3d"
+	"github.com/mki1967/go-mki3d/glmki3d"
 	"math"
 	// "math/rand"
 	_ "image/png"
@@ -17,7 +17,7 @@ const BoxMargin = 30 // margin for bounding box of the stage
 
 var FrameColor = mki3d.Vector3dType{1.0, 1.0, 1.0} // color of the bounding box frame
 
-var NumberOfMonsters = 10
+var NumberOfMonsters = 20
 
 var NumberOfTokens = 10
 

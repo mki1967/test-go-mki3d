@@ -7,7 +7,7 @@ import (
 	// "github.com/go-gl/mathgl/mgl32"
 	// "math"
 	// "github.com/mki1967/go-mki3d/mki3d"
-	// "github.com/mki1967/test-go-mki3d/glmki3d"
+	// "github.com/mki1967/go-mki3d/glmki3d"
 )
 
 func (g *Mki3dGame) Mki3dMouseButtonCallback(w *glfw.Window, button glfw.MouseButton, action glfw.Action, mod glfw.ModifierKey) {

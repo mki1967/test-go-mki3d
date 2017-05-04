@@ -1,5 +1,9 @@
-// run in the source code directory with: go run *.go  <filename>.mki3d
-
+// This program demontsrates the use of packages: "github.com/mki1967/go-mki3d/mki3d" and  "github.com/mki1967/go-mki3d/glmki3d"
+// It reads mki3d data from a file  produced with MKI3D RAPID MODELER ( https://mki1967.github.io/mki3d/ ) 
+// and displays it using the packages "github.com/go-gl/gl/v3.3-core/gl", "github.com/go-gl/glfw/v3.2/glfw" and "github.com/go-gl/mathgl/mgl32"
+// 
+// Run in the source code directory with: go run *.go  <filename>.mki3d
+// 
 package main
 
 import (
@@ -8,7 +12,7 @@ import (
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/mki1967/go-mki3d/mki3d"
-	"github.com/mki1967/test-go-mki3d/glmki3d"
+	"github.com/mki1967/go-mki3d/glmki3d"
 	"log"
 	"os"
 	"runtime"
@@ -55,14 +59,14 @@ func main() {
 	fmt.Println("Trying to read from ", os.Args[1])
 
 	// Load mki3d data from a file
-	mki3dPtr, err := mki3d.ReadFile(os.Args[1])
+	mki3dPtr, err := mki3d.ReadFile(os.Args[1]) // load mki3d data from the file produced by MKI3D
 	if err != nil {
 		panic(err)
 	}
 
-	// fmt.Printf("%v\n", mki3d.Stringify(mki3dPtr)) // for tests ...
+	// fmt.Printf("%v\n", mki3d.Stringify(mki3dPtr)) // for tests ... demonstrates  mki3d.Stringify
 
-	// fragments from https://github.com/go-gl/examples/blob/master/gl41core-cube/cube.go
+	// updated fragments from https://github.com/go-gl/examples/blob/master/gl41core-cube/cube.go
 
 	if err := glfw.Init(); err != nil {
 		log.Fatalln("failed to initialize glfw:", err)
@@ -110,10 +114,10 @@ func main() {
 	DataShaderPtr = mki3dDataShaderPtr // set the global variable
 
 	// Get current width and height of the window
-	width, height := window.GetSize()
-	DataShaderPtr.UniPtr.SetProjectionFromMki3d(mki3dPtr, width, height)
-	DataShaderPtr.UniPtr.SetViewFromMki3d(mki3dPtr)
-	DataShaderPtr.UniPtr.SetLightFromMki3d(mki3dPtr)
+	width, height := window.GetSize() // needed for projection setting
+	DataShaderPtr.UniPtr.SetProjectionFromMki3d(mki3dPtr, width, height) // set the sane projection as in the mki3d data
+	DataShaderPtr.UniPtr.SetViewFromMki3d(mki3dPtr) // set the same view as in mki3d data
+	DataShaderPtr.UniPtr.SetLightFromMki3d(mki3dPtr) // set the same light as in mki3d data 
 
 	// setting callbacks
 	window.SetSizeCallback(SizeCallback)
