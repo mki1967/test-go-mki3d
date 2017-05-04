@@ -10,8 +10,7 @@ MKI3D editor (see: https://mki1967.github.io/mki3d/ ) in Go language with the us
 At this moment the repository contains:
 
 * simple - a simple demo of reading and displaying  MKI3D data.
-* mki3dgame - a game, where you have to collect tokens on randomly selected stages and avoid being captured by the monsters
-  (the stages, tokens and monsters are designed with MKI3D and just placed in specific sub-directories. You can design your own stages.)
+* mki3dgame - a game, where you have to collect tokens on randomly selected stages and avoid being captured by the monsters. The stages, tokens and monsters are designed with MKI3D and just placed in specific sub-directories. You can design your own stages. You can see the screen-cast at:  https://youtu.be/vp6nhvOqhdU
 
 To run the programs you need the Go language  and the following packages:
 
