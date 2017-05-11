@@ -17,6 +17,7 @@ func (g *Mki3dGame) Mki3dMouseButtonCallback(w *glfw.Window, button glfw.MouseBu
 	}
 
 	if action == glfw.Press {
+		g.Paused = false
 		width, height := w.GetSize()
 		fx, fy := w.GetCursorPos()
 		x := int(fx)

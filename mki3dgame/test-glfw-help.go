@@ -9,6 +9,7 @@ Key press actions:
   Shift + Arrow keys  - move observer sideways
   B, F - move observer backward or forward
   L - set the diffuse light directiorn perpendicular to the screen
+  P - pause the game
 
 Sectors action layout:
 ----------------------

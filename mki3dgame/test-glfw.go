@@ -107,18 +107,26 @@ func main() {
 	// main loop
 	for !window.ShouldClose() {
 
-		game.ProbeTime()
-		game.Update()
-		game.Redraw()
 
 		// Maintenance
 		window.SwapBuffers()
-		// glfw.WaitEvents()
 		if doInMainThread != nil {
 			doInMainThread()     // execute required function
 			doInMainThread = nil // done
 		}
-		glfw.PollEvents()
+
+		if( game.Paused ) {
+			game.CancelAction()
+			glfw.WaitEvents()
+			game.ProbeTime()
+		} else {
+			game.ProbeTime()
+			game.Update()
+			game.Paused = game.PauseRequest.TestAndCancel() // check for pause
+			glfw.PollEvents()
+		}
+		game.Redraw()
+
 	}
 
 	fmt.Println("YOUR TOTAL SCORE IS: ", game.TotalScore)

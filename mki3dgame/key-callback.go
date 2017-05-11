@@ -20,6 +20,7 @@ func (g *Mki3dGame) KeyCallback(w *glfw.Window, key glfw.Key, scancode int, acti
 	}
 
 	if action == glfw.Press {
+		g.Paused = false
 		// g := GamePtr // short name
 		switch {
 
@@ -80,6 +81,9 @@ func (g *Mki3dGame) KeyCallback(w *glfw.Window, key glfw.Key, scancode int, acti
 			/* help */
 		case key == glfw.KeyH && mods == 0:
 			message(helpText)
+		case key == glfw.KeyP && mods == 0: /* PAUSE */
+			g.PauseRequest.Set()
+			fmt.Println("PAUSED")
 		}
 	}
 }
