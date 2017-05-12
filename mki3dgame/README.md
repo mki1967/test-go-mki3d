@@ -1,3 +1,6 @@
+NOTE: The game mki3dgame will be further developed as a standalone project at https://github.com/mki1967/mki3dgame
+
+
 This is a game that demonstrates the use of the data produced with MKI3D web 3D editor (see: https://mki1967.github.io/mki3d/ ).
 
 To run the game you need the packages:
