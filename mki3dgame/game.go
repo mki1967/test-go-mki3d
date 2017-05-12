@@ -60,6 +60,8 @@ type Mki3dGame struct {
 
 	PauseRequest Flag // set by a goroutine to request pause
 	Paused bool // true if game is paused
+
+	WasAction Flag // set ech time the user action is executed
 }
 
 // Make game structure with the shader and without any data.
@@ -100,7 +102,10 @@ func MakeEmptyGame(pathToAssets string, window *glfw.Window) (*Mki3dGame, error)
 	window.SetMouseButtonCallback(game.Mki3dMouseButtonCallback)
 
 	game.PauseRequest = MakeFlag()
+	game.WasAction = MakeFlag()
 
+	go game.EcoFreezer() // run concurrent eco-freezer goroutine
+	
 	return &game, nil
 
 }
@@ -444,6 +449,8 @@ func (game *Mki3dGame) Redraw() {
 		gl.Disable(gl.DEPTH_TEST)
 		game.SectorsDSPtr.DrawStage()
 		gl.Enable(gl.DEPTH_TEST)
+	} else {
+		game.WasAction.Set(); // set for EcoFreezer
 	}
 
 }
