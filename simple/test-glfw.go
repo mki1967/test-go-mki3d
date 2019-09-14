@@ -125,6 +125,7 @@ func main() {
 
 	message(helpText) // initial help message
 
+	fmt.Println( "LOADED DATA\n\n"+mki3d.Stringify(mki3dPtr) );
 	previousTime := glfw.GetTime()
 	// main loop
 	for !window.ShouldClose() {
