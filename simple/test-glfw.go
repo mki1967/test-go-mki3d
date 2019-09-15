@@ -1,9 +1,9 @@
 // This program demontsrates the use of packages: "github.com/mki1967/go-mki3d/mki3d" and  "github.com/mki1967/go-mki3d/glmki3d"
-// It reads mki3d data from a file  produced with MKI3D RAPID MODELER ( https://mki1967.github.io/mki3d/ ) 
+// It reads mki3d data from a file  produced with MKI3D RAPID MODELER ( https://mki1967.github.io/mki3d/ )
 // and displays it using the packages "github.com/go-gl/gl/v3.3-core/gl", "github.com/go-gl/glfw/v3.2/glfw" and "github.com/go-gl/mathgl/mgl32"
-// 
+//
 // Run in the source code directory with: go run *.go  <filename>.mki3d
-// 
+//
 package main
 
 import (
@@ -11,8 +11,8 @@ import (
 	"fmt"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
-	"github.com/mki1967/go-mki3d/mki3d"
 	"github.com/mki1967/go-mki3d/glmki3d"
+	"github.com/mki1967/go-mki3d/mki3d"
 	"log"
 	"os"
 	"runtime"
@@ -114,10 +114,10 @@ func main() {
 	DataShaderPtr = mki3dDataShaderPtr // set the global variable
 
 	// Get current width and height of the window
-	width, height := window.GetSize() // needed for projection setting
+	width, height := window.GetSize()                                    // needed for projection setting
 	DataShaderPtr.UniPtr.SetProjectionFromMki3d(mki3dPtr, width, height) // set the sane projection as in the mki3d data
-	DataShaderPtr.UniPtr.SetViewFromMki3d(mki3dPtr) // set the same view as in mki3d data
-	DataShaderPtr.UniPtr.SetLightFromMki3d(mki3dPtr) // set the same light as in mki3d data 
+	DataShaderPtr.UniPtr.SetViewFromMki3d(mki3dPtr)                      // set the same view as in mki3d data
+	DataShaderPtr.UniPtr.SetLightFromMki3d(mki3dPtr)                     // set the same light as in mki3d data
 
 	// setting callbacks
 	window.SetSizeCallback(SizeCallback)
@@ -125,7 +125,7 @@ func main() {
 
 	message(helpText) // initial help message
 
-	fmt.Println( "LOADED DATA\n\n"+mki3d.Stringify(mki3dPtr) );
+	fmt.Println("LOADED DATA\n\n" + mki3d.Stringify(mki3dPtr))
 	previousTime := glfw.GetTime()
 	// main loop
 	for !window.ShouldClose() {
